@@ -1,0 +1,44 @@
+0000-0001 Bind Pose
+0002-0060 loop Idle
+0063-0138 loop  Walk
+0140-0198 Start Walk Two Legs
+0199-0275 loop Walk Two Leg
+0276-0320 End Walk TwoLeg   skopiowac 275 na 276
+0322-0343 loop Run
+0346-0484 loop Fight Idle
+0487-0530 loop Attack Front Leg
+0531-0572 loop Attack Tail
+0574-0598 Start Eating
+0599-0698 loop Eating
+0699-0724 End Eating
+0725-0768 Start Eating 01
+0769-0867 loop Eating 01
+0867-0911 End Eating
+0913-0942 loop Jumping
+0945-0973 loop Hit Left
+0974-1003 loop Hit Right
+1004-1033 loop Hit Front
+1034-1063 loop Hit Back
+1065-1162 Death
+1164-1283 loop Idle
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

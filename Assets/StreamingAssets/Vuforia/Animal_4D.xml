@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="hat-marker" size="1.000000 1.000000" />
+    <ImageTarget name="dog-marker" size="1.000000 1.000000" />
+    <ImageTarget name="cat-marker" size="1.000000 1.000000" />
+    <ImageTarget name="ball-marker" size="1.000000 1.000000" />
+  </Tracking>
+</QCARConfig>

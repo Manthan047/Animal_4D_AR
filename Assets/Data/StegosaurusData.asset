@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22ab2b58f409ecb488e403e3ccfd90f3, type: 3}
+  m_Name: StegosaurusData
+  m_EditorClassIdentifier: Assembly-CSharp::AnimalData
+  animalName: Stegosaurus
+  scientificName: Stegosaurus stenops
+  classification: Plated Herbivore (Plant Eater)
+  era: Late Jurassic (~155 - 150 Million Years Ago)
+  averageLength: 9.0 meters (30 ft)
+  averageWeight: 5,000 kg (5 metric tons)
+  description: Stegosaurus inhabited the lush floodplains of Late Jurassic North
+    America millions of years earlier, around 155 to 150 million years ago, making
+    it a prominent slow-moving herbivore of its era. Easily recognized by the double
+    row of large, flat, kite-shaped bony plates lining its arched back, Stegosaurus
+    used these vascularized structures primarily for body temperature regulation,
+    species recognition, or intimidating rivals by flushing them with blood. Despite
+    having a relatively tiny brain relative to its massive 30-foot body, it possessed
+    a formidable physical defense at the tip of its flexible tail. Known as a thagomizer,
+    this natural weapon featured four long, dangerously sharp bony spikes that Stegosaurus
+    could swing sideways with immense force to ward off apex predators like Allosaurus.
+  funFact: Despite being the size of a bus, Stegosaurus had a brain the size of a
+    single walnut (weighing only about 80 grams)!
+  thumbnail: {fileID: 21300000, guid: c3d4e5f60718293a4b5c6d7e8f90a1b2, type: 3}
+  image2D: {fileID: 21300000, guid: a5d19127c66de9e4c96887a9bb09bcf5, type: 3}
+  roarClip: {fileID: 8300000, guid: 00c4aabf3ec4a7f4880d03c357ead6d5, type: 3}
+  ambientClip: {fileID: 0}
+  descriptionAudioClip: {fileID: 8300000, guid: 4789dae6e5f635e45af43b1994ab7c18,
+    type: 3}
+  targetScale: {x: 1, y: 1, z: 1}
+  targetRotationOffset: {x: 0, y: 0, z: 0}
+  previewModelPrefab: {fileID: 4749789834116724448, guid: 8e062c9c6993a82468e2d7e94bbc5086,
+    type: 3}

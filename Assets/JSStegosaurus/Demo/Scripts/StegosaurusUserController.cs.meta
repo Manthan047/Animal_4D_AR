@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 3b278c7d7f282f844b4423cce4ce5a12
+timeCreated: 1537088025
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 64924
+  packageName: Complete J. Suko Animals pack
+  packageVersion: 1.23
+  assetPath: Assets/JSAllAnimals/Vertebrata/Reptiles/Dinosaurus/Stegosaurus/Demo/Scripts/StegosaurusUserController.cs
+  uploadId: 718833

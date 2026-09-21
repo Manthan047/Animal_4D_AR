@@ -1,0 +1,683 @@
+fileFormatVersion: 2
+guid: 38697aab86bea6443919d5a857abcb9e
+ModelImporter:
+  serializedVersion: 19301
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: Belly_L
+  - first:
+      1: 100002
+    second: Belly_R
+  - first:
+      1: 100004
+    second: Calf_L
+  - first:
+      1: 100006
+    second: Calf_R
+  - first:
+      1: 100008
+    second: Clavicle_L
+  - first:
+      1: 100010
+    second: Clavicle_R
+  - first:
+      1: 100012
+    second: Eye_L
+  - first:
+      1: 100014
+    second: Eye_R
+  - first:
+      1: 100016
+    second: Foot_L
+  - first:
+      1: 100018
+    second: Foot_R
+  - first:
+      1: 100020
+    second: FootIK_L
+  - first:
+      1: 100022
+    second: FootIK_R
+  - first:
+      1: 100024
+    second: Forearm_L
+  - first:
+      1: 100026
+    second: Forearm_R
+  - first:
+      1: 100028
+    second: Hand_L.1
+  - first:
+      1: 100030
+    second: Hand_L.2
+  - first:
+      1: 100032
+    second: Hand_R.1
+  - first:
+      1: 100034
+    second: Hand_R.2
+  - first:
+      1: 100036
+    second: HandIK_L
+  - first:
+      1: 100038
+    second: HandIK_R
+  - first:
+      1: 100040
+    second: Head
+  - first:
+      1: 100042
+    second: HorseLink_L
+  - first:
+      1: 100044
+    second: HorseLink_R
+  - first:
+      1: 100046
+    second: Joe
+  - first:
+      1: 100048
+    second: LowerEyelid_L
+  - first:
+      1: 100050
+    second: LowerEyelid_R
+  - first:
+      1: 100052
+    second: Mouth
+  - first:
+      1: 100054
+    second: Neck.003
+  - first:
+      1: 100056
+    second: Neck.1
+  - first:
+      1: 100058
+    second: Neck.2
+  - first:
+      1: 100060
+    second: Pelvis
+  - first:
+      1: 100062
+    second: Plate.001
+  - first:
+      1: 100064
+    second: Plate.002
+  - first:
+      1: 100066
+    second: Plate.003
+  - first:
+      1: 100068
+    second: Plate.004
+  - first:
+      1: 100070
+    second: Plate.005
+  - first:
+      1: 100072
+    second: Plate.006
+  - first:
+      1: 100074
+    second: Plate.007
+  - first:
+      1: 100076
+    second: Plate.008
+  - first:
+      1: 100078
+    second: Plate.009
+  - first:
+      1: 100080
+    second: Plate.010
+  - first:
+      1: 100082
+    second: Plate.011
+  - first:
+      1: 100084
+    second: Plate.012
+  - first:
+      1: 100086
+    second: Plate.013
+  - first:
+      1: 100088
+    second: Plate.014
+  - first:
+      1: 100090
+    second: Plate.015
+  - first:
+      1: 100092
+    second: Plate.016
+  - first:
+      1: 100094
+    second: Plate.017
+  - first:
+      1: 100096
+    second: Root
+  - first:
+      1: 100098
+    second: Spine.1
+  - first:
+      1: 100100
+    second: Spine.2
+  - first:
+      1: 100102
+    second: Spine.3
+  - first:
+      1: 100104
+    second: //RootNode
+  - first:
+      1: 100106
+    second: StegosaurusDummmi
+  - first:
+      1: 100108
+    second: Tail
+  - first:
+      1: 100110
+    second: Tail.001
+  - first:
+      1: 100112
+    second: Tail.002
+  - first:
+      1: 100114
+    second: Tail.003
+  - first:
+      1: 100116
+    second: Tail.004
+  - first:
+      1: 100118
+    second: Thigh_L
+  - first:
+      1: 100120
+    second: Thigh_R
+  - first:
+      1: 100122
+    second: Tongue.003
+  - first:
+      1: 100124
+    second: Tongue.1
+  - first:
+      1: 100126
+    second: Tongue.2
+  - first:
+      1: 100128
+    second: UpperArm_L
+  - first:
+      1: 100130
+    second: UpperArm_R
+  - first:
+      1: 100132
+    second: UpperEyelid_L
+  - first:
+      1: 100134
+    second: UpperEyelid_R
+  - first:
+      4: 400000
+    second: Belly_L
+  - first:
+      4: 400002
+    second: Belly_R
+  - first:
+      4: 400004
+    second: Calf_L
+  - first:
+      4: 400006
+    second: Calf_R
+  - first:
+      4: 400008
+    second: Clavicle_L
+  - first:
+      4: 400010
+    second: Clavicle_R
+  - first:
+      4: 400012
+    second: Eye_L
+  - first:
+      4: 400014
+    second: Eye_R
+  - first:
+      4: 400016
+    second: Foot_L
+  - first:
+      4: 400018
+    second: Foot_R
+  - first:
+      4: 400020
+    second: FootIK_L
+  - first:
+      4: 400022
+    second: FootIK_R
+  - first:
+      4: 400024
+    second: Forearm_L
+  - first:
+      4: 400026
+    second: Forearm_R
+  - first:
+      4: 400028
+    second: Hand_L.1
+  - first:
+      4: 400030
+    second: Hand_L.2
+  - first:
+      4: 400032
+    second: Hand_R.1
+  - first:
+      4: 400034
+    second: Hand_R.2
+  - first:
+      4: 400036
+    second: HandIK_L
+  - first:
+      4: 400038
+    second: HandIK_R
+  - first:
+      4: 400040
+    second: Head
+  - first:
+      4: 400042
+    second: HorseLink_L
+  - first:
+      4: 400044
+    second: HorseLink_R
+  - first:
+      4: 400046
+    second: Joe
+  - first:
+      4: 400048
+    second: LowerEyelid_L
+  - first:
+      4: 400050
+    second: LowerEyelid_R
+  - first:
+      4: 400052
+    second: Mouth
+  - first:
+      4: 400054
+    second: Neck.003
+  - first:
+      4: 400056
+    second: Neck.1
+  - first:
+      4: 400058
+    second: Neck.2
+  - first:
+      4: 400060
+    second: Pelvis
+  - first:
+      4: 400062
+    second: Plate.001
+  - first:
+      4: 400064
+    second: Plate.002
+  - first:
+      4: 400066
+    second: Plate.003
+  - first:
+      4: 400068
+    second: Plate.004
+  - first:
+      4: 400070
+    second: Plate.005
+  - first:
+      4: 400072
+    second: Plate.006
+  - first:
+      4: 400074
+    second: Plate.007
+  - first:
+      4: 400076
+    second: Plate.008
+  - first:
+      4: 400078
+    second: Plate.009
+  - first:
+      4: 400080
+    second: Plate.010
+  - first:
+      4: 400082
+    second: Plate.011
+  - first:
+      4: 400084
+    second: Plate.012
+  - first:
+      4: 400086
+    second: Plate.013
+  - first:
+      4: 400088
+    second: Plate.014
+  - first:
+      4: 400090
+    second: Plate.015
+  - first:
+      4: 400092
+    second: Plate.016
+  - first:
+      4: 400094
+    second: Plate.017
+  - first:
+      4: 400096
+    second: Root
+  - first:
+      4: 400098
+    second: Spine.1
+  - first:
+      4: 400100
+    second: Spine.2
+  - first:
+      4: 400102
+    second: Spine.3
+  - first:
+      4: 400104
+    second: //RootNode
+  - first:
+      4: 400106
+    second: StegosaurusDummmi
+  - first:
+      4: 400108
+    second: Tail
+  - first:
+      4: 400110
+    second: Tail.001
+  - first:
+      4: 400112
+    second: Tail.002
+  - first:
+      4: 400114
+    second: Tail.003
+  - first:
+      4: 400116
+    second: Tail.004
+  - first:
+      4: 400118
+    second: Thigh_L
+  - first:
+      4: 400120
+    second: Thigh_R
+  - first:
+      4: 400122
+    second: Tongue.003
+  - first:
+      4: 400124
+    second: Tongue.1
+  - first:
+      4: 400126
+    second: Tongue.2
+  - first:
+      4: 400128
+    second: UpperArm_L
+  - first:
+      4: 400130
+    second: UpperArm_R
+  - first:
+      4: 400132
+    second: UpperEyelid_L
+  - first:
+      4: 400134
+    second: UpperEyelid_R
+  - first:
+      74: 7400000
+    second: WalkBack
+  - first:
+      95: 9500000
+    second: //RootNode
+  externalObjects: {}
+  materials:
+    materialImportMode: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 0
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: WalkBack
+      takeName: Take 001
+      internalID: 0
+      firstFrame: 0
+      lastFrame: 75
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Root
+        weight: 1
+      - path: Root/FootIK_L
+        weight: 1
+      - path: Root/FootIK_R
+        weight: 1
+      - path: Root/HandIK_L
+        weight: 1
+      - path: Root/HandIK_R
+        weight: 1
+      - path: Root/Pelvis
+        weight: 1
+      - path: Root/Pelvis/Plate.013
+        weight: 1
+      - path: Root/Pelvis/Spine.1
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Belly_L
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Belly_R
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Plate.012
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Plate.009
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Plate.010
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Plate.011
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Clavicle_L
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Clavicle_L/UpperArm_L
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Clavicle_L/UpperArm_L/Forearm_L
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Clavicle_L/UpperArm_L/Forearm_L/Hand_L.1
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Clavicle_L/UpperArm_L/Forearm_L/Hand_L.1/Hand_L.2
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Clavicle_R
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Clavicle_R/UpperArm_R
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Clavicle_R/UpperArm_R/Forearm_R
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Clavicle_R/UpperArm_R/Forearm_R/Hand_R.1
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Clavicle_R/UpperArm_R/Forearm_R/Hand_R.1/Hand_R.2
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/Eye_L
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/Eye_R
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/Joe
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/Joe/Tongue.1
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/Joe/Tongue.1/Tongue.2
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/Joe/Tongue.1/Tongue.2/Tongue.003
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/LowerEyelid_L
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/LowerEyelid_R
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/Mouth
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/UpperEyelid_L
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Head/UpperEyelid_R
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Plate.001
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Plate.002
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Neck.003/Plate.003
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Plate.004
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Neck.2/Plate.005
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Neck.1/Plate.006
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Plate.007
+        weight: 1
+      - path: Root/Pelvis/Spine.1/Spine.2/Spine.3/Plate.008
+        weight: 1
+      - path: Root/Pelvis/Tail
+        weight: 1
+      - path: Root/Pelvis/Tail/Plate.014
+        weight: 1
+      - path: Root/Pelvis/Tail/Tail.001
+        weight: 1
+      - path: Root/Pelvis/Tail/Tail.001/Plate.015
+        weight: 1
+      - path: Root/Pelvis/Tail/Tail.001/Tail.002
+        weight: 1
+      - path: Root/Pelvis/Tail/Tail.001/Tail.002/Plate.016
+        weight: 1
+      - path: Root/Pelvis/Tail/Tail.001/Tail.002/Tail.003
+        weight: 1
+      - path: Root/Pelvis/Tail/Tail.001/Tail.002/Tail.003/Plate.017
+        weight: 1
+      - path: Root/Pelvis/Tail/Tail.001/Tail.002/Tail.003/Tail.004
+        weight: 1
+      - path: Root/Pelvis/Thigh_L
+        weight: 1
+      - path: Root/Pelvis/Thigh_L/Calf_L
+        weight: 1
+      - path: Root/Pelvis/Thigh_L/Calf_L/HorseLink_L
+        weight: 1
+      - path: Root/Pelvis/Thigh_L/Calf_L/HorseLink_L/Foot_L
+        weight: 1
+      - path: Root/Pelvis/Thigh_R
+        weight: 1
+      - path: Root/Pelvis/Thigh_R/Calf_R
+        weight: 1
+      - path: Root/Pelvis/Thigh_R/Calf_R/HorseLink_R
+        weight: 1
+      - path: Root/Pelvis/Thigh_R/Calf_R/HorseLink_R/Foot_R
+        weight: 1
+      - path: StegosaurusDummmi
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 3
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importVisibility: 0
+    importBlendShapes: 1
+    importCameras: 0
+    importLights: 0
+    fileIdsGeneration: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
+    indexFormat: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 4
+    normalCalculationMode: 0
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 0.0762
+    rootMotionBoneName: Root
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 64924
+  packageName: Complete J. Suko Animals pack
+  packageVersion: 1.23
+  assetPath: Assets/JSAllAnimals/Vertebrata/Reptiles/Dinosaurus/Stegosaurus/Animations/StegosaurusAnimWalkBack.FBX
+  uploadId: 718833

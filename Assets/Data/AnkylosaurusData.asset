@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22ab2b58f409ecb488e403e3ccfd90f3, type: 3}
+  m_Name: AnkylosaurusData
+  m_EditorClassIdentifier: Assembly-CSharp::AnimalData
+  animalName: Ankylosaurus
+  scientificName: Ankylosaurus magniventris
+  classification: Armored Herbivore (Plant Eater)
+  era: Late Cretaceous (~68 - 66 Million Years Ago)
+  averageLength: 8.0 meters (26 ft)
+  averageWeight: 6,000 kg (6 metric tons)
+  description: 'Ankylosaurus was a heavily armored herbivore that coexisted alongside
+    Tyrannosaurus Rex, acting as the living tank of the Late Cretaceous ecosystem.
+    Measuring roughly 25 to 30 feet in length, its low-slung, broad body was covered
+    from head to tail in a fortress of thick osteoderms, bony plates, and fused armor
+    embedded directly into its skin. Even its eyelids were protected by bony plates,
+    leaving almost no vulnerable soft tissue exposed to attacking predators. If a
+    carnivore attempted an ambush, Ankylosaurus could hunker down to protect its
+    unarmored underbelly and swing its signature defense weapon: a massive, heavy
+    tail club formed from fused vertebrae and solid bone. A single powerful blow
+    from this club was fully capable of shattering the legs or ribs of any pursuing
+    predator.'
+  funFact: Ankylosaurus wielded a massive club of solid bone at the end of its tail,
+    powerful enough to break the leg bones of an attacking T-Rex!
+  thumbnail: {fileID: 21300000, guid: 6c28ef9b4ecfc644096e8bf2634f5499, type: 3}
+  image2D: {fileID: 21300000, guid: cd3e18660dfc02b40a90d42db70086b1, type: 3}
+  roarClip: {fileID: 8300000, guid: f0e9939d181850645b7b9b40bb5d0cc2, type: 3}
+  ambientClip: {fileID: 0}
+  descriptionAudioClip: {fileID: 8300000, guid: 86a4386c2a5acb543a79ea3374f5f417,
+    type: 3}
+  targetScale: {x: 1, y: 1, z: 1}
+  targetRotationOffset: {x: 0, y: 0, z: 0}
+  previewModelPrefab: {fileID: 5183170192721066411, guid: e4a716a2d43788747a113f9e7eaf8811,
+    type: 3}
