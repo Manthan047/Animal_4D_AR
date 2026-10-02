@@ -1,7 +1,6 @@
 using UnityEngine;
 using Vuforia;
 
-[RequireComponent(typeof(ObserverBehaviour))]
 public class ARTrackableObserver : MonoBehaviour
 {
     private ObserverBehaviour observer;
@@ -20,10 +19,6 @@ public class ARTrackableObserver : MonoBehaviour
         {
             observer.OnTargetStatusChanged += HandleTargetStatusChanged;
         }
-        else
-        {
-            Debug.LogWarning($"[ARTrackableObserver] No ObserverBehaviour found on {gameObject.name}.");
-        }
     }
 
     private void OnDestroy()
@@ -36,7 +31,6 @@ public class ARTrackableObserver : MonoBehaviour
 
     private void HandleTargetStatusChanged(ObserverBehaviour behaviour, TargetStatus status)
     {
-        // Re-query in case children were enabled/instantiated
         if (animalAction == null)
         {
             animalAction = GetComponentInChildren<IAnimalAction>(true);

@@ -33,7 +33,7 @@ public class PlayIdleOnTracking : MonoBehaviour
             {
                 animalAction.PlayIdle();
             }
-            else if (animator != null)
+            else if (animator != null && animator.HasState(0, Animator.StringToHash("Idle")))
             {
                 animator.Play("Idle", 0, 0f);
             }

@@ -1,35 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class ARUIManager : MonoBehaviour
 {
-    [Header("Panel Root")]
-    [Tooltip("The whole AR scan panel. Hidden whenever the catalog is open.")]
-    [SerializeField] private GameObject arScanPanel;
-
     [Header("Cross-Reference (for mutual exclusivity)")]
     [SerializeField] private AnimalCatalogManager animalCatalogManager;
 
     [Header("Bottom HUD - Action Buttons")]
     [SerializeField] private GameObject actionButtonsPanel;
     [SerializeField] private Button actionButton;
-    [SerializeField] private Button moveButton;
-    [SerializeField] private Button idleButton;
     [SerializeField] private Button infoToggleBtn;
+
+    [Header("Back Button")]
+    [Tooltip("Closes the info card if it is open. Otherwise fires On Back Pressed (hook up catalog / previous screen here).")]
+    [SerializeField] private Button backButton;
+    [SerializeField] private UnityEvent onBackPressed;
 
     [Header("Side Info Panel")]
     [SerializeField] private GameObject infoCardPanel;
     [SerializeField] private bool autoShowInfoCardOnScan = false;
-    [SerializeField] private TextMeshProUGUI infoTitleText;
-    [SerializeField] private TextMeshProUGUI infoDescriptionText;
-    [SerializeField] private TextMeshProUGUI infoFunFactText;
-    [SerializeField] private Button closeInfoBtn;
-
-    [Tooltip("The Scroll Rect that wraps the description text. It is reset to the top whenever the description changes. Auto-found from the description text if left empty.")]
-    [SerializeField] private ScrollRect infoScrollRect;
 
     [Header("Description Narration Audio Toggle")]
     [SerializeField] private Toggle audioToggle;
@@ -39,11 +31,17 @@ public class ARUIManager : MonoBehaviour
     private bool isPlayingDescriptionAudio = false;
 
     [Header("Side Panel Footer Icons")]
-    [SerializeField] private Button mode4DButton;
-    [SerializeField] private TextMeshProUGUI mode4DLabelText;
     [SerializeField] private Image flatImageDisplay;
-    [SerializeField] private Button wikipediaButton;
     [SerializeField] private Button shareButton;
+
+    [Header("Share Settings")]
+    [SerializeField] private string shareSubject = "Animal 4D+ AR";
+    [Tooltip("Optional. Added to the end of the share message (e.g. your Play Store link).")]
+    [SerializeField] private string shareLink = "";
+    [Tooltip("Also attach a screenshot. Needs the NativeShare plugin and the scripting define symbol USE_NATIVE_SHARE.")]
+    [SerializeField] private bool shareScreenshot = false;
+
+    private bool isSharing = false;
 
     private bool isShowing3DModel = true;
     private AnimalData currentAnimalData;
@@ -54,14 +52,8 @@ public class ARUIManager : MonoBehaviour
     [Header("Mini 3D Viewer")]
     [SerializeField] private ModelPreviewController modelPreviewController;
 
-    [Header("Scanning Guidance Overlay")]
-    [SerializeField] private GameObject scanningOverlayPanel;
-    [SerializeField] private TextMeshProUGUI scanningText;
-
     private readonly Dictionary<Transform, Vector3> _buttonBaseScales = new Dictionary<Transform, Vector3>();
     private readonly Dictionary<Transform, Coroutine> _buttonPressRoutines = new Dictionary<Transform, Coroutine>();
-
-    private Coroutine resetScrollRoutine;
 
     // Gate set by PanelController once the start button -> loading -> instructions
     // sequence has finished. Until then, actionButtonsPanel/infoCardPanel stay
@@ -74,28 +66,107 @@ public class ARUIManager : MonoBehaviour
 
     private void Awake()
     {
+        AutoResolveReferences();
+
         if (animalCatalogManager == null)
         {
-            animalCatalogManager = FindFirstObjectByType<AnimalCatalogManager>(FindObjectsInactive.Include);
+            animalCatalogManager = FindAnyObjectByType<AnimalCatalogManager>(FindObjectsInactive.Include);
         }
 
         if (modelPreviewController == null)
         {
-            modelPreviewController = FindFirstObjectByType<ModelPreviewController>(FindObjectsInactive.Include);
-        }
-
-        if (infoScrollRect == null && infoDescriptionText != null)
-        {
-            infoScrollRect = infoDescriptionText.GetComponentInParent<ScrollRect>(true);
+            modelPreviewController = FindAnyObjectByType<ModelPreviewController>(FindObjectsInactive.Include);
         }
 
         if (descriptionAudioSource == null)
         {
-            descriptionAudioSource = gameObject.AddComponent<AudioSource>();
+            descriptionAudioSource = GetComponent<AudioSource>();
+            if (descriptionAudioSource == null)
+            {
+                descriptionAudioSource = gameObject.AddComponent<AudioSource>();
+            }
             descriptionAudioSource.playOnAwake = false;
             descriptionAudioSource.loop = false;
         }
     }
+
+    private void AutoResolveReferences()
+    {
+        Transform[] allTransforms = FindObjectsByType<Transform>(FindObjectsInactive.Include);
+
+        foreach (Transform t in allTransforms)
+        {
+            string tName = t.name.Trim();
+
+            if (actionButtonsPanel == null && (tName == "Actions Buttons Panel" || tName == "ActionButtonsPanel"))
+                actionButtonsPanel = t.gameObject;
+
+            if (infoCardPanel == null && (tName == "info card panel" || tName == "InfoCardPanel"))
+                infoCardPanel = t.gameObject;
+
+            if (infoToggleBtn == null && (tName == "Info" || tName == "info" || tName == "InfoButton" || tName == "info_background"))
+            {
+                Button b = t.GetComponent<Button>();
+                if (b != null) infoToggleBtn = b;
+                else
+                {
+                    Button cb = t.GetComponentInChildren<Button>(true);
+                    if (cb != null) infoToggleBtn = cb;
+                }
+            }
+
+            if (actionButton == null && (tName == "Action Button" || tName == "ActionButton"))
+                actionButton = t.GetComponent<Button>();
+
+            if (backButton == null && (tName == "Back_button" || tName == "BackButton" || tName == "Back Button"))
+                backButton = t.GetComponent<Button>();
+
+            if (view2D3DToggle == null && (tName == "Toggle" || tName == "Animated_toggle"))
+            {
+                if (infoCardPanel != null && t.IsChildOf(infoCardPanel.transform))
+                {
+                    view2D3DToggle = t.GetComponent<AnimatedToggle>();
+                    if (view2D3DToggle == null) view2D3DToggle = t.GetComponentInChildren<AnimatedToggle>(true);
+                }
+            }
+
+            if (flatImageDisplay == null && (tName == "2DImage" || tName == "2D_Image"))
+            {
+                if (infoCardPanel != null && t.IsChildOf(infoCardPanel.transform))
+                {
+                    flatImageDisplay = t.GetComponent<Image>();
+                }
+            }
+
+            if (modelPreviewController == null && (tName == "RawImage" || tName == "ModelPreviewController"))
+            {
+                if (infoCardPanel != null && t.IsChildOf(infoCardPanel.transform))
+                {
+                    modelPreviewController = t.GetComponent<ModelPreviewController>();
+                }
+            }
+
+            if (audioToggle == null && (tName == "Volume" || tName == "AudioToggle"))
+            {
+                if (infoCardPanel != null && t.IsChildOf(infoCardPanel.transform))
+                {
+                    audioToggle = t.GetComponent<Toggle>();
+                }
+            }
+
+            // Share button: matched by name anywhere in the scene (it no longer has to be
+            // inside the info card panel). If the Button component is on a child, find it.
+            if (shareButton == null && (tName == "Share_button" || tName == "ShareButton" || tName == "Share" || tName == "share"))
+            {
+                Button sb = t.GetComponent<Button>();
+                if (sb == null) sb = t.GetComponentInChildren<Button>(true);
+                if (sb != null) shareButton = sb;
+            }
+        }
+    }
+
+    public bool IsShowing3DModel => isShowing3DModel;
+    public AnimalData CurrentAnimalData => currentAnimalData;
 
     private void OnEnable()
     {
@@ -107,6 +178,12 @@ public class ARUIManager : MonoBehaviour
                 HandleSelectedAnimalChanged(ARAnimalManager.Instance.SelectedAnimal);
             }
         }
+
+        if (LanguageManager.Instance != null)
+        {
+            LanguageManager.Instance.OnLanguageChanged -= HandleLanguageChanged;
+            LanguageManager.Instance.OnLanguageChanged += HandleLanguageChanged;
+        }
     }
 
     private void OnDisable()
@@ -116,21 +193,35 @@ public class ARUIManager : MonoBehaviour
             ARAnimalManager.Instance.OnSelectedAnimalChanged -= HandleSelectedAnimalChanged;
         }
 
-        resetScrollRoutine = null;
+        if (LanguageManager.Instance != null)
+        {
+            LanguageManager.Instance.OnLanguageChanged -= HandleLanguageChanged;
+        }
+
         StopDescriptionAudio();
     }
 
     private void Start()
     {
+        if (LanguageManager.Instance != null)
+        {
+            LanguageManager.Instance.OnLanguageChanged -= HandleLanguageChanged;
+            LanguageManager.Instance.OnLanguageChanged += HandleLanguageChanged;
+        }
+
         if (actionButton != null) actionButton.onClick.AddListener(OnActionButtonClicked);
-        if (moveButton != null) moveButton.onClick.AddListener(OnMoveButtonClicked);
-        if (idleButton != null) idleButton.onClick.AddListener(OnIdleButtonClicked);
         if (infoToggleBtn != null) infoToggleBtn.onClick.AddListener(ToggleInfoCard);
-        if (closeInfoBtn != null) closeInfoBtn.onClick.AddListener(HideInfoCard);
-        if (mode4DButton != null) mode4DButton.onClick.AddListener(OnMode4DButtonClicked);
-        if (wikipediaButton != null) wikipediaButton.onClick.AddListener(OnWikipediaButtonClicked);
-        if (shareButton != null) shareButton.onClick.AddListener(OnShareButtonClicked);
+        if (backButton != null) backButton.onClick.AddListener(OnBackButtonClicked);
         if (view2D3DToggle != null) view2D3DToggle.onValueChanged.AddListener(OnView2D3DToggleChanged);
+
+        if (shareButton != null)
+        {
+            shareButton.onClick.AddListener(OnShareButtonClicked);
+        }
+        else
+        {
+            Debug.LogWarning("[ARUIManager] Share button not found. Drag it into the 'Share Button' field in the Inspector.", this);
+        }
 
         if (audioToggle != null) audioToggle.onValueChanged.AddListener(OnAudioToggleChanged);
 
@@ -155,12 +246,8 @@ public class ARUIManager : MonoBehaviour
     private void OnDestroy()
     {
         if (actionButton != null) actionButton.onClick.RemoveListener(OnActionButtonClicked);
-        if (moveButton != null) moveButton.onClick.RemoveListener(OnMoveButtonClicked);
-        if (idleButton != null) idleButton.onClick.RemoveListener(OnIdleButtonClicked);
         if (infoToggleBtn != null) infoToggleBtn.onClick.RemoveListener(ToggleInfoCard);
-        if (closeInfoBtn != null) closeInfoBtn.onClick.RemoveListener(HideInfoCard);
-        if (mode4DButton != null) mode4DButton.onClick.RemoveListener(OnMode4DButtonClicked);
-        if (wikipediaButton != null) wikipediaButton.onClick.RemoveListener(OnWikipediaButtonClicked);
+        if (backButton != null) backButton.onClick.RemoveListener(OnBackButtonClicked);
         if (shareButton != null) shareButton.onClick.RemoveListener(OnShareButtonClicked);
         if (view2D3DToggle != null) view2D3DToggle.onValueChanged.RemoveListener(OnView2D3DToggleChanged);
 
@@ -168,14 +255,25 @@ public class ARUIManager : MonoBehaviour
     }
 
     // =========================================================
+    // LANGUAGE CHANGE HANDLER
+    // =========================================================
+
+    private void HandleLanguageChanged(string newLang)
+    {
+        ResolveCurrentAnimalData();
+
+        if (currentAnimalData != null && animalCatalogManager != null)
+        {
+            animalCatalogManager.UpdateDetailUI(currentAnimalData);
+        }
+
+        UpdateAudioToggleInteractable();
+    }
+
+    // =========================================================
     // INTRO HAND-OFF
     // =========================================================
 
-    /// <summary>
-    /// Called by PanelController once the start button -> loading -> instructions
-    /// sequence has finished. Before this is called, action buttons / info card
-    /// stay hidden even if an animal was already detected in the background.
-    /// </summary>
     public void OnIntroFinished()
     {
         introFinished = true;
@@ -200,6 +298,10 @@ public class ARUIManager : MonoBehaviour
             if (data != null)
             {
                 currentAnimalData = data;
+                if (animalCatalogManager != null)
+                {
+                    animalCatalogManager.UpdateDetailUI(data);
+                }
             }
 
             ShowARScanPanel();
@@ -208,8 +310,6 @@ public class ARUIManager : MonoBehaviour
         UpdateUIState(animal);
     }
 
-    public bool IsShowing3DModel => isShowing3DModel;
-
     public void SetCurrentAnimal(AnimalData data, bool openInfoPanel = false)
     {
         if (data == null) return;
@@ -217,8 +317,12 @@ public class ARUIManager : MonoBehaviour
         StopDescriptionAudio();
 
         currentAnimalData = data;
-        UpdateAnimalInfoTexts(currentAnimalData);
         UpdateAudioToggleInteractable();
+
+        if (animalCatalogManager != null)
+        {
+            animalCatalogManager.UpdateDetailUI(data);
+        }
 
         if (openInfoPanel)
         {
@@ -234,16 +338,14 @@ public class ARUIManager : MonoBehaviour
     // PANEL VISIBILITY
     // =========================================================
 
+    // The AR scan panel reference was removed; this now only closes the catalog.
     public void ShowARScanPanel()
     {
-        if (arScanPanel != null) arScanPanel.SetActive(true);
         if (animalCatalogManager != null) animalCatalogManager.CloseCatalogPanel();
     }
 
-    public void HideARScanPanel()
-    {
-        if (arScanPanel != null) arScanPanel.SetActive(false);
-    }
+    // Kept only so external scripts (e.g. AnimalCatalogManager) still compile.
+    public void HideARScanPanel() { }
 
     // =========================================================
     // UPDATE UI STATE
@@ -251,17 +353,9 @@ public class ARUIManager : MonoBehaviour
 
     private void UpdateUIState(IAnimalAction animal)
     {
-        // Gated: won't show action buttons until the intro sequence is done,
-        // even if an animal was already detected while it was still playing.
         bool hasActiveAnimal = introFinished && animal != null;
 
         if (actionButtonsPanel != null) actionButtonsPanel.SetActive(hasActiveAnimal);
-
-        if (scanningOverlayPanel != null)
-        {
-            scanningOverlayPanel.SetActive(introFinished && !hasActiveAnimal);
-            if (scanningText != null) scanningText.text = "Point camera at an Animal card to begin 4D AR experience";
-        }
 
         if (animal != null)
         {
@@ -269,8 +363,12 @@ public class ARUIManager : MonoBehaviour
             if (data != null)
             {
                 currentAnimalData = data;
-                UpdateAnimalInfoTexts(currentAnimalData);
                 UpdateAudioToggleInteractable();
+
+                if (animalCatalogManager != null)
+                {
+                    animalCatalogManager.UpdateDetailUI(data);
+                }
 
                 if (introFinished && autoShowInfoCardOnScan && infoCardPanel != null) ShowInfoCard();
             }
@@ -278,68 +376,8 @@ public class ARUIManager : MonoBehaviour
 
         if (infoCardPanel != null && infoCardPanel.activeSelf)
         {
-            if (currentAnimalData != null) UpdateAnimalInfoTexts(currentAnimalData);
             SetPreviewDisplayMode(isShowing3DModel);
         }
-    }
-
-    private void UpdateAnimalInfoTexts(AnimalData data)
-    {
-        if (data == null) return;
-
-        if (infoTitleText != null) infoTitleText.text = data.animalName;
-        if (infoDescriptionText != null) infoDescriptionText.text = data.description;
-
-        if (infoFunFactText != null)
-        {
-            if (!string.IsNullOrEmpty(data.funFact))
-            {
-                infoFunFactText.text = "Fun Fact: " + data.funFact;
-                infoFunFactText.gameObject.SetActive(true);
-            }
-            else
-            {
-                infoFunFactText.text = "";
-                infoFunFactText.gameObject.SetActive(false);
-            }
-        }
-
-        // New text is in place, so send the description back to the top.
-        ResetInfoScroll();
-    }
-
-    // =========================================================
-    // RESET DESCRIPTION SCROLL
-    // =========================================================
-
-    private void ResetInfoScroll()
-    {
-        if (infoScrollRect == null || !isActiveAndEnabled) return;
-
-        if (resetScrollRoutine != null) StopCoroutine(resetScrollRoutine);
-        resetScrollRoutine = StartCoroutine(ResetInfoScrollRoutine());
-    }
-
-    private IEnumerator ResetInfoScrollRoutine()
-    {
-        // Wait a frame so the new text has been laid out. Setting the position
-        // in the same frame as the text change gets overwritten by the rebuild.
-        yield return null;
-
-        if (infoScrollRect != null)
-        {
-            Canvas.ForceUpdateCanvases();
-
-            if (infoScrollRect.content != null)
-            {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(infoScrollRect.content);
-            }
-
-            infoScrollRect.StopMovement();                  // cancel leftover inertia
-            infoScrollRect.verticalNormalizedPosition = 1f; // 1 = top
-        }
-
-        resetScrollRoutine = null;
     }
 
     // =========================================================
@@ -350,27 +388,58 @@ public class ARUIManager : MonoBehaviour
     {
         if (infoCardPanel != null) infoCardPanel.SetActive(true);
 
-        if (currentAnimalData == null)
-        {
-            if (ARAnimalManager.Instance != null && ARAnimalManager.Instance.SelectedAnimal != null)
-            {
-                currentAnimalData = ARAnimalManager.Instance.SelectedAnimal.GetAnimalData();
-            }
-
-            if (currentAnimalData == null)
-            {
-                AnimalData[] all = Resources.LoadAll<AnimalData>("");
-                if (all != null && all.Length > 0) currentAnimalData = all[0];
-            }
-        }
+        ResolveCurrentAnimalData();
 
         if (currentAnimalData != null)
         {
-            UpdateAnimalInfoTexts(currentAnimalData);
             UpdateAudioToggleInteractable();
+
+            if (animalCatalogManager != null)
+            {
+                animalCatalogManager.UpdateDetailUI(currentAnimalData);
+            }
         }
 
         SetPreviewDisplayMode(isShowing3DModel);
+        StartCoroutine(RefreshInfoLayout());
+    }
+
+    // Rebuilds the layout one frame after opening so the description text is not blank,
+    // and makes sure the description starts from its first line.
+    private IEnumerator RefreshInfoLayout()
+    {
+        yield return null;
+
+        if (infoCardPanel == null) yield break;
+
+        Canvas.ForceUpdateCanvases();
+
+        RectTransform rt = infoCardPanel.GetComponent<RectTransform>();
+        if (rt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rt);
+
+        if (animalCatalogManager != null) animalCatalogManager.ScrollDescriptionToTop();
+    }
+
+    private void ResolveCurrentAnimalData()
+    {
+        if (currentAnimalData != null) return;
+
+        if (ARAnimalManager.Instance != null && ARAnimalManager.Instance.SelectedAnimal != null)
+        {
+            currentAnimalData = ARAnimalManager.Instance.SelectedAnimal.GetAnimalData();
+        }
+
+        if (currentAnimalData == null && animalCatalogManager != null && animalCatalogManager.CurrentSelectedData != null)
+        {
+            currentAnimalData = animalCatalogManager.CurrentSelectedData;
+        }
+
+        if (currentAnimalData == null)
+        {
+            AnimalData[] all = Resources.LoadAll<AnimalData>("Data");
+            if (all == null || all.Length == 0) all = Resources.LoadAll<AnimalData>("");
+            if (all != null && all.Length > 0) currentAnimalData = all[0];
+        }
     }
 
     public void ToggleInfoCard()
@@ -405,31 +474,30 @@ public class ARUIManager : MonoBehaviour
     }
 
     // =========================================================
-    // ACTION BUTTONS
+    // BACK BUTTON
+    // =========================================================
+
+    private void OnBackButtonClicked()
+    {
+        if (backButton != null) AnimateButtonPress(backButton.transform);
+
+        if (infoCardPanel != null && infoCardPanel.activeSelf)
+        {
+            HideInfoCard();
+            return;
+        }
+
+        onBackPressed?.Invoke();
+    }
+
+    // =========================================================
+    // ACTION BUTTON
     // =========================================================
 
     private void OnActionButtonClicked()
     {
         if (actionButton != null) AnimateButtonPress(actionButton.transform);
         if (ARAnimalManager.Instance != null) ARAnimalManager.Instance.TriggerAction();
-    }
-
-    private void OnMoveButtonClicked()
-    {
-        if (moveButton != null) AnimateButtonPress(moveButton.transform);
-        if (ARAnimalManager.Instance != null) ARAnimalManager.Instance.TriggerMove();
-    }
-
-    private void OnIdleButtonClicked()
-    {
-        if (idleButton != null) AnimateButtonPress(idleButton.transform);
-        if (ARAnimalManager.Instance != null) ARAnimalManager.Instance.TriggerIdle();
-    }
-
-    private void OnMode4DButtonClicked()
-    {
-        if (mode4DButton != null) AnimateButtonPress(mode4DButton.transform);
-        SetPreviewDisplayMode(!isShowing3DModel);
     }
 
     // =========================================================
@@ -562,42 +630,112 @@ public class ARUIManager : MonoBehaviour
             }
         }
 
-        if (mode4DLabelText != null) mode4DLabelText.text = show3D ? "3D Mode" : "2D Mode";
-
         if (view2D3DToggle != null) view2D3DToggle.SetIsOnWithoutNotify(show3D);
     }
 
     // =========================================================
-    // WIKIPEDIA & SHARE
+    // SHARE
     // =========================================================
-
-    private void OnWikipediaButtonClicked()
-    {
-        if (wikipediaButton != null) AnimateButtonPress(wikipediaButton.transform);
-
-        string animalName = currentAnimalData != null && !string.IsNullOrEmpty(currentAnimalData.animalName)
-            ? currentAnimalData.animalName
-            : infoTitleText != null ? infoTitleText.text : "Animal";
-
-        string encodedName = System.Uri.EscapeDataString(animalName);
-        Application.OpenURL($"https://en.wikipedia.org/wiki/{encodedName}");
-    }
 
     private void OnShareButtonClicked()
     {
         if (shareButton != null) AnimateButtonPress(shareButton.transform);
 
-        string animalName = currentAnimalData != null && !string.IsNullOrEmpty(currentAnimalData.animalName)
-            ? currentAnimalData.animalName
-            : infoTitleText != null ? infoTitleText.text : "Animal";
+        if (isSharing) return;
 
-        Debug.Log($"[ARUIManager] Share requested: Check out {animalName} in Animal 4D+ AR!");
+        ResolveCurrentAnimalData();
+
+        string animalName = "Animal";
+        if (currentAnimalData != null)
+        {
+            string localized = currentAnimalData.GetLocalizedName();
+            if (!string.IsNullOrEmpty(localized)) animalName = localized;
+        }
+
+        string message = $"Check out {animalName} in {shareSubject}!";
+        if (!string.IsNullOrEmpty(shareLink)) message += "\n" + shareLink;
+
+        Debug.Log($"[ARUIManager] Share requested: {message}");
+
+        StartCoroutine(ShareRoutine(shareSubject, message));
+    }
+
+    private IEnumerator ShareRoutine(string subject, string message)
+    {
+        isSharing = true;
+
+#if USE_NATIVE_SHARE
+        if (shareScreenshot)
+        {
+            // Wait until the frame is fully rendered, then capture it.
+            yield return new WaitForEndOfFrame();
+
+            Texture2D tex = ScreenCapture.CaptureScreenshotAsTexture();
+            string path = System.IO.Path.Combine(Application.temporaryCachePath, "animal_share.png");
+            System.IO.File.WriteAllBytes(path, tex.EncodeToPNG());
+            Destroy(tex);
+
+            new NativeShare()
+                .AddFile(path)
+                .SetSubject(subject)
+                .SetText(message)
+                .Share();
+
+            yield return new WaitForSeconds(0.5f);
+            isSharing = false;
+            yield break;
+        }
+#endif
+
+        ShareText(subject, message);
+
+        // Small delay so a double tap does not open two share sheets.
+        yield return new WaitForSeconds(0.5f);
+        isSharing = false;
+    }
+
+    // Text-only share using the native share sheet. No plugin needed on Android.
+    private void ShareText(string subject, string message)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        try
+        {
+            using (AndroidJavaClass intentClass = new AndroidJavaClass("android.content.Intent"))
+            using (AndroidJavaObject intent = new AndroidJavaObject("android.content.Intent"))
+            {
+                intent.Call<AndroidJavaObject>("setAction", intentClass.GetStatic<string>("ACTION_SEND"));
+                intent.Call<AndroidJavaObject>("setType", "text/plain");
+                intent.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_SUBJECT"), subject);
+                intent.Call<AndroidJavaObject>("putExtra", intentClass.GetStatic<string>("EXTRA_TEXT"), message);
+
+                using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                using (AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                using (AndroidJavaObject chooser = intentClass.CallStatic<AndroidJavaObject>("createChooser", intent, "Share via"))
+                {
+                    activity.Call("startActivity", chooser);
+                }
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("[ARUIManager] Share failed: " + e.Message);
+            GUIUtility.systemCopyBuffer = message; // fallback so the user can still paste it
+        }
+#else
+        // Editor / iOS without the plugin / other platforms: copy to clipboard so the action is testable.
+        GUIUtility.systemCopyBuffer = message;
+        Debug.Log($"[ARUIManager] Share sheet only opens on an Android device build. Message copied to clipboard:\n{message}");
+#endif
     }
 
     private void OnView2D3DToggleChanged(bool is3D)
     {
         SetPreviewDisplayMode(is3D);
     }
+
+    // =========================================================
+    // BUTTON PRESS ANIMATION
+    // =========================================================
 
     private void AnimateButtonPress(Transform btnTransform)
     {

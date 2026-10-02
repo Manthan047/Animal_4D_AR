@@ -73,7 +73,10 @@ public class RexAnimationController: MonoBehaviour, IAnimalAction
 
         animator.enabled = true;
         animator.SetLayerWeight(defaultStateLayer, 1f);
-        animator.Play(defaultStateName, defaultStateLayer, 0f);
+        if (animator.HasState(defaultStateLayer, Animator.StringToHash(defaultStateName)))
+        {
+            animator.Play(defaultStateName, defaultStateLayer, 0f);
+        }
         animator.Update(0f);
     }
 

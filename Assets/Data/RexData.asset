@@ -12,26 +12,187 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22ab2b58f409ecb488e403e3ccfd90f3, type: 3}
   m_Name: RexData
   m_EditorClassIdentifier: Assembly-CSharp::AnimalData
-  animalName: Tyrannosaurus Rex
+  animalName:
+    english: Tyrannosaurus Rex
+    spanish: Tiranosaurio Rex
+    hindi: "\u091F\u093E\u092F\u0930\u093E\u0928\u094B\u0938\u0949\u0930\u0938 \u0930\u0947\u0915\u094D\u0938"
   scientificName: Tyrannosaurus rex
-  classification: Apex Carnivore (Meat Eater)
-  era: Late Cretaceous (~68 - 66 Million Years Ago)
+  classification:
+    english: Apex Carnivore (Theropod)
+    spanish: "Superdepredador Carn\xEDvoro (Ter\xF3podo)"
+    hindi: "\u0936\u0940\u0930\u094D\u0937 \u092E\u093E\u0902\u0938\u093E\u0939\u093E\u0930\u0940
+      (\u0925\u0947\u0930\u094B\u092A\u094B\u0921)"
+  era:
+    english: "Late Cretaceous (~68 \u2013 66 Million Years Ago)"
+    spanish: "Cret\xE1cico Tard\xEDo (~68 \u2013 66 millones de a\xF1os atr\xE1s)"
+    hindi: "\u0909\u0924\u094D\u0924\u0930 \u0915\u094D\u0930\u0947\u091F\u0947\u0936\u093F\u092F\u0938
+      \u0915\u093E\u0932 (~6.8 \u2013 6.6 \u0915\u0930\u094B\u0921\u093C \u0935\u0930\u094D\u0937
+      \u092A\u0942\u0930\u094D\u0935)"
   averageLength: 12.3 meters (40 ft)
   averageWeight: 8,400 kg (8.4 metric tons)
-  description: Tyrannosaurus Rex stands as one of the most iconic and terrifying
-    land predators to ever walk the Earth, dominating the western North American
-    landscape during the Late Cretaceous period roughly 68 to 66 million years ago.
-    Reaching lengths of up to 40 feet and weighing around 8 metric tons, this massive
-    bipedal carnivore possessed a heavily reinforced skull housing a devastating
-    bite force capable of crushing bone. Its mouth was packed with serrated, banana-sized
-    teeth up to 12 inches long, which allowed it to easily tear through the tough
-    hides of contemporary herbivores. Supported by immensely powerful hind legs that
-    provided surprising agility for its scale, T. rex balanced its body with a thick,
-    heavy tail, using its advanced binocular vision and exceptionally sharp sense
-    of smell to track down prey or locate carcasses across vast distances.
-  funFact: T-Rex possessed the strongest bite force of any terrestrial animal in
-    Earth's history - over 12,800 pounds of force, easily crushing bone!
-  thumbnail: {fileID: 21300000, guid: a1b2c3d4e5f60718293a4b5c6d7e8f90, type: 3}
+  description:
+    english: 'Overview: Tyrannosaurus rex lived about 68 to 66 million years ago,
+      in the last two million years before the dinosaurs went extinct. Its fossils
+      come from western North America, mainly the Hell Creek Formation in Montana
+      and nearby regions. It was one of the largest meat-eating land animals that
+      ever lived, and it was the top predator of its ecosystem.
+
+
+      Body: An
+      adult grew to about 12 meters (40 ft) long and 3.7 meters (12 ft) tall at the
+      hips, and weighed roughly 8,000 to 9,000 kg. Its skull was about 1.5 meters
+      long and built to take huge stress. Its teeth were thick, banana-shaped and
+      up to 30 cm (12 in) long including the root, made for crushing bone rather
+      than slicing. The arms were tiny, about 1 meter long with two fingers each,
+      but they were strong and muscular.
+
+
+      Senses and hunting: T. rex had forward-facing
+      eyes, which gave it excellent depth perception. It also had very large olfactory
+      bulbs, which means a keen sense of smell. Its bite was among the strongest
+      of any land animal, estimated at over 12,800 pounds (about 57,000 newtons)
+      of force. Fossils with healed bite marks show that T. rex both hunted live
+      prey and scavenged.
+
+
+      Growth: Bone studies show a T. rex grew very fast
+      as a teenager, gaining up to about 2 kg a day, and reached full size around
+      age 20. Most lived to about 28 years.
+
+
+      Fun facts: The famous specimen
+      "Sue" is one of the most complete T. rex skeletons ever found. T. rex lived
+      alongside Triceratops and Ankylosaurus.'
+    spanish: "Descripci\xF3n general: El Tyrannosaurus rex vivi\xF3 hace aproximadamente
+      entre 68 y 66 millones de a\xF1os, en los dos \xFAltimos millones de a\xF1os
+      antes de la extinci\xF3n de los dinosaurios. Sus f\xF3siles provienen del oeste
+      de Norteam\xE9rica, principalmente de la Formaci\xF3n Hell Creek en Montana
+      y regiones cercanas. Fue uno de los animales terrestres carn\xEDvoros m\xE1s
+      grandes que jam\xE1s hayan existido y el principal depredador de su ecosistema.\r\n\r\nCuerpo:
+      Un adulto med\xEDa aproximadamente 12 metros de largo y 3,7 metros de alto
+      a la altura de las caderas, y pesaba entre 8000 y 9000 kg. Su cr\xE1neo med\xEDa
+      alrededor de 1,5 metros de largo y estaba dise\xF1ado para soportar una enorme
+      presi\xF3n. Sus dientes eran gruesos, con forma de pl\xE1tano y med\xEDan hasta
+      30 cm de largo incluyendo la ra\xEDz, adaptados para triturar huesos en lugar
+      de cortarlos. Sus brazos eran peque\xF1os, de aproximadamente 1 metro de largo
+      con dos dedos cada uno, pero eran fuertes y musculosos.\r\n\r\nSentidos y caza:
+      El T. rex ten\xEDa ojos frontales, lo que le proporcionaba una excelente percepci\xF3n
+      de la profundidad. Tambi\xE9n pose\xEDa bulbos olfatorios muy grandes, lo que
+      significa un agudo sentido del olfato. Su mordida era una de las m\xE1s fuertes
+      de cualquier animal terrestre, con una fuerza estimada de m\xE1s de 57\_000
+      newtons (12\_800 libras). Los f\xF3siles con marcas de mordeduras cicatrizadas
+      demuestran que el T. rex cazaba presas vivas y tambi\xE9n se alimentaba de
+      carro\xF1a.\r\n\r\nCrecimiento: Los estudios \xF3seos muestran que un T. rex
+      crec\xEDa muy r\xE1pido durante su adolescencia, ganando hasta unos 2 kg al
+      d\xEDa, y alcanzaba su tama\xF1o adulto alrededor de los 20 a\xF1os. La mayor\xEDa
+      viv\xEDa unos 28 a\xF1os.\r\n\r\nCuriosidades: El famoso ejemplar \"Sue\" es
+      uno de los esqueletos de T. rex m\xE1s completos jam\xE1s encontrados. El T.
+      rex convivi\xF3 con el Triceratops y el Ankylosaurus."
+    hindi: "\u0938\u0902\u0915\u094D\u0937\u093F\u092A\u094D\u0924 \u0935\u093F\u0935\u0930\u0923:
+      \u091F\u093E\u092F\u0930\u093E\u0928\u094B\u0938\u0949\u0930\u0938 \u0930\u0947\u0915\u094D\u0938
+      \u0932\u0917\u092D\u0917 68 \u0938\u0947 66 \u092E\u093F\u0932\u093F\u092F\u0928
+      \u0935\u0930\u094D\u0937 \u092A\u0942\u0930\u094D\u0935, \u0921\u093E\u092F\u0928\u093E\u0938\u094B\u0930\u094B\u0902
+      \u0915\u0947 \u0935\u093F\u0932\u0941\u092A\u094D\u0924 \u0939\u094B\u0928\u0947
+      \u0938\u0947 \u0920\u0940\u0915 \u0926\u094B \u092E\u093F\u0932\u093F\u092F\u0928
+      \u0935\u0930\u094D\u0937 \u092A\u0939\u0932\u0947 \u091C\u0940\u0935\u093F\u0924
+      \u0925\u093E\u0964 \u0907\u0938\u0915\u0947 \u091C\u0940\u0935\u093E\u0936\u094D\u092E
+      \u092A\u0936\u094D\u091A\u093F\u092E\u0940 \u0909\u0924\u094D\u0924\u0930\u0940
+      \u0905\u092E\u0947\u0930\u093F\u0915\u093E, \u092E\u0941\u0916\u094D\u092F
+      \u0930\u0942\u092A \u0938\u0947 \u092E\u094B\u0902\u091F\u093E\u0928\u093E
+      \u092E\u0947\u0902 \u0939\u0947\u0932 \u0915\u094D\u0930\u0940\u0915 \u092B\u0949\u0930\u094D\u092E\u0947\u0936\u0928
+      \u0914\u0930 \u0906\u0938\u092A\u093E\u0938 \u0915\u0947 \u0915\u094D\u0937\u0947\u0924\u094D\u0930\u094B\u0902
+      \u0938\u0947 \u092A\u094D\u0930\u093E\u092A\u094D\u0924 \u0939\u0941\u090F
+      \u0939\u0948\u0902\u0964 \u092F\u0939 \u0905\u092C \u0924\u0915 \u0915\u0947
+      \u0938\u092C\u0938\u0947 \u092C\u0921\u093C\u0947 \u092E\u093E\u0902\u0938\u093E\u0939\u093E\u0930\u0940
+      \u0938\u094D\u0925\u0932\u0940\u092F \u091C\u093E\u0928\u0935\u0930\u094B\u0902
+      \u092E\u0947\u0902 \u0938\u0947 \u090F\u0915 \u0925\u093E \u0914\u0930 \u0905\u092A\u0928\u0947
+      \u092A\u093E\u0930\u093F\u0938\u094D\u0925\u093F\u0924\u093F\u0915\u0940 \u0924\u0902\u0924\u094D\u0930
+      \u0915\u093E \u0936\u0940\u0930\u094D\u0937 \u0936\u093F\u0915\u093E\u0930\u0940
+      \u0925\u093E\u0964\r\n\r\n\u0936\u0930\u0940\u0930: \u090F\u0915 \u0935\u092F\u0938\u094D\u0915
+      \u091F\u093E\u092F\u0930\u093E\u0928\u094B\u0938\u0949\u0930\u0938 \u0930\u0947\u0915\u094D\u0938
+      \u0932\u0917\u092D\u0917 12 \u092E\u0940\u091F\u0930 (40 \u092B\u0940\u091F)
+      \u0932\u0902\u092C\u093E \u0914\u0930 \u0915\u0942\u0932\u094D\u0939\u094B\u0902
+      \u0924\u0915 3.7 \u092E\u0940\u091F\u0930 (12 \u092B\u0940\u091F) \u090A\u0902\u091A\u093E
+      \u0939\u094B\u0924\u093E \u0925\u093E, \u0914\u0930 \u0907\u0938\u0915\u093E
+      \u0935\u091C\u0928 \u0932\u0917\u092D\u0917 8,000 \u0938\u0947 9,000 \u0915\u093F\u0932\u094B\u0917\u094D\u0930\u093E\u092E
+      \u0939\u094B\u0924\u093E \u0925\u093E\u0964 \u0907\u0938\u0915\u0940 \u0916\u094B\u092A\u0921\u093C\u0940
+      \u0932\u0917\u092D\u0917 1.5 \u092E\u0940\u091F\u0930 \u0932\u0902\u092C\u0940
+      \u0925\u0940 \u0914\u0930 \u092D\u093E\u0930\u0940 \u0926\u092C\u093E\u0935
+      \u0938\u0939\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F \u092C\u0928\u0940
+      \u0925\u0940\u0964 \u0907\u0938\u0915\u0947 \u0926\u093E\u0902\u0924 \u092E\u094B\u091F\u0947,
+      \u0915\u0947\u0932\u0947 \u0915\u0947 \u0906\u0915\u093E\u0930 \u0915\u0947
+      \u0914\u0930 \u091C\u0921\u093C \u0938\u0939\u093F\u0924 30 \u0938\u0947\u0902\u091F\u0940\u092E\u0940\u091F\u0930
+      (12 \u0907\u0902\u091A) \u0924\u0915 \u0932\u0902\u092C\u0947 \u0939\u094B\u0924\u0947
+      \u0925\u0947, \u091C\u094B \u0939\u0921\u094D\u0921\u093F\u092F\u094B\u0902
+      \u0915\u094B \u0915\u093E\u091F\u0928\u0947 \u0915\u0947 \u092C\u091C\u093E\u092F
+      \u0915\u0941\u091A\u0932\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F \u092C\u0928\u0947
+      \u0925\u0947\u0964 \u0907\u0938\u0915\u0940 \u092D\u0941\u091C\u093E\u090F\u0901
+      \u091B\u094B\u091F\u0940 \u0925\u0940\u0902, \u0932\u0917\u092D\u0917 1 \u092E\u0940\u091F\u0930
+      \u0932\u0902\u092C\u0940 \u0914\u0930 \u092A\u094D\u0930\u0924\u094D\u092F\u0947\u0915
+      \u092E\u0947\u0902 \u0926\u094B \u0909\u0902\u0917\u0932\u093F\u092F\u093E\u0901
+      \u0925\u0940\u0902, \u0932\u0947\u0915\u093F\u0928 \u0935\u0947 \u092E\u091C\u092C\u0942\u0924
+      \u0914\u0930 \u092E\u093E\u0902\u0938\u0932 \u0925\u0940\u0902\u0964\r\n\r\n\u0907\u0902\u0926\u094D\u0930\u093F\u092F\u093E\u0901
+      \u0914\u0930 \u0936\u093F\u0915\u093E\u0930: \u091F\u0940. \u0930\u0947\u0915\u094D\u0938
+      \u0915\u0940 \u0906\u0901\u0916\u0947\u0902 \u0906\u0917\u0947 \u0915\u0940
+      \u0913\u0930 \u0939\u094B\u0924\u0940 \u0925\u0940\u0902, \u091C\u093F\u0938\u0938\u0947
+      \u0907\u0938\u0947 \u0909\u0924\u094D\u0915\u0943\u0937\u094D\u091F \u0917\u0939\u0930\u093E\u0908
+      \u0915\u093E \u092C\u094B\u0927 \u0939\u094B\u0924\u093E \u0925\u093E\u0964
+      \u0907\u0938\u0915\u0947 \u0918\u094D\u0930\u093E\u0923 \u092C\u0932\u094D\u092C
+      \u092D\u0940 \u092C\u0939\u0941\u0924 \u092C\u0921\u093C\u0947 \u0925\u0947,
+      \u091C\u093F\u0938\u0915\u093E \u0905\u0930\u094D\u0925 \u0939\u0948 \u0907\u0938\u0915\u0940
+      \u0938\u0942\u0902\u0918\u0928\u0947 \u0915\u0940 \u0924\u0940\u0935\u094D\u0930
+      \u0915\u094D\u0937\u092E\u0924\u093E\u0964 \u0907\u0938\u0915\u093E \u0915\u093E\u091F\u0928\u093E
+      \u0915\u093F\u0938\u0940 \u092D\u0940 \u0938\u094D\u0925\u0932\u0940\u092F
+      \u091C\u093E\u0928\u0935\u0930 \u0915\u0947 \u0915\u093E\u091F\u0928\u0947
+      \u0938\u0947 \u0915\u0939\u0940\u0902 \u0905\u0927\u093F\u0915 \u0936\u0915\u094D\u0924\u093F\u0936\u093E\u0932\u0940
+      \u0925\u093E, \u091C\u093F\u0938\u0915\u0940 \u0905\u0928\u0941\u092E\u093E\u0928\u093F\u0924
+      \u0936\u0915\u094D\u0924\u093F 12,800 \u092A\u093E\u0909\u0902\u0921 (\u0932\u0917\u092D\u0917
+      57,000 \u0928\u094D\u092F\u0942\u091F\u0928) \u0938\u0947 \u0905\u0927\u093F\u0915
+      \u0925\u0940\u0964 \u0920\u0940\u0915 \u0939\u094B \u091A\u0941\u0915\u0947
+      \u0915\u093E\u091F\u0928\u0947 \u0915\u0947 \u0928\u093F\u0936\u093E\u0928
+      \u0935\u093E\u0932\u0947 \u091C\u0940\u0935\u093E\u0936\u094D\u092E \u0926\u0930\u094D\u0936\u093E\u0924\u0947
+      \u0939\u0948\u0902 \u0915\u093F \u091F\u0940. \u0930\u0947\u0915\u094D\u0938
+      \u091C\u0940\u0935\u093F\u0924 \u0936\u093F\u0915\u093E\u0930 \u0915\u093E
+      \u092D\u0940 \u0936\u093F\u0915\u093E\u0930 \u0915\u0930\u0924\u093E \u0925\u093E
+      \u0914\u0930 \u092E\u0943\u0924 \u091C\u093E\u0928\u0935\u0930\u094B\u0902
+      \u0915\u093E \u092E\u093E\u0902\u0938 \u092D\u0940 \u0916\u093E\u0924\u093E
+      \u0925\u093E\u0964\r\n\r\n\u0935\u093F\u0915\u093E\u0938: \u0939\u0921\u094D\u0921\u093F\u092F\u094B\u0902
+      \u0915\u0947 \u0905\u0927\u094D\u092F\u092F\u0928 \u0938\u0947 \u092A\u0924\u093E
+      \u091A\u0932\u0924\u093E \u0939\u0948 \u0915\u093F \u0915\u093F\u0936\u094B\u0930\u093E\u0935\u0938\u094D\u0925\u093E
+      \u092E\u0947\u0902 \u091F\u0940. \u0930\u0947\u0915\u094D\u0938 \u0915\u093E
+      \u0935\u093F\u0915\u093E\u0938 \u092C\u0939\u0941\u0924 \u0924\u0947\u091C\u0940
+      \u0938\u0947 \u0939\u094B\u0924\u093E \u0925\u093E, \u092A\u094D\u0930\u0924\u093F\u0926\u093F\u0928
+      \u0932\u0917\u092D\u0917 2 \u0915\u093F\u0932\u094B\u0917\u094D\u0930\u093E\u092E
+      \u0924\u0915 \u0935\u091C\u0928 \u092C\u0922\u093C\u0924\u093E \u0925\u093E,
+      \u0914\u0930 \u0932\u0917\u092D\u0917 20 \u0935\u0930\u094D\u0937 \u0915\u0940
+      \u0906\u092F\u0941 \u092E\u0947\u0902 \u092F\u0939 \u0905\u092A\u0928\u0947
+      \u092A\u0942\u0930\u094D\u0923 \u0906\u0915\u093E\u0930 \u0924\u0915 \u092A\u0939\u0941\u0901\u091A
+      \u091C\u093E\u0924\u093E \u0925\u093E\u0964 \u0905\u0927\u093F\u0915\u093E\u0902\u0936
+      \u0932\u0917\u092D\u0917 28 \u0935\u0930\u094D\u0937 \u0924\u0915 \u091C\u0940\u0935\u093F\u0924
+      \u0930\u0939\u0924\u0947 \u0925\u0947\u0964\r\n\r\n\u0930\u094B\u091A\u0915
+      \u0924\u0925\u094D\u092F: \u092A\u094D\u0930\u0938\u093F\u0926\u094D\u0927
+      \u0928\u092E\u0942\u0928\u093E \"\u0938\u0942\" \u0905\u092C \u0924\u0915 \u092A\u093E\u090F
+      \u0917\u090F \u0938\u092C\u0938\u0947 \u092A\u0942\u0930\u094D\u0923 \u091F\u0940.
+      \u0930\u0947\u0915\u094D\u0938 \u0915\u0902\u0915\u093E\u0932\u094B\u0902 \u092E\u0947\u0902
+      \u0938\u0947 \u090F\u0915 \u0939\u0948\u0964 \u091F\u0940. \u0930\u0947\u0915\u094D\u0938
+      \u091F\u094D\u0930\u093E\u0907\u0938\u0947\u0930\u093E\u091F\u0949\u092A\u094D\u0938
+      \u0914\u0930 \u090F\u0902\u0915\u093F\u0932\u094B\u0938\u0949\u0930\u0938 \u0915\u0947
+      \u0938\u093E\u0925 \u0930\u0939\u0924\u093E \u0925\u093E\u0964"
+  funFact:
+    english: "T-Rex possessed the strongest bite force of any terrestrial animal
+      in history \u2014 over 12,800 pounds of crushing force, easily shattering solid
+      bone!"
+    spanish: "\xA1El T-Rex ten\xEDa la mordida m\xE1s poderosa de cualquier animal
+      terrestre: m\xE1s de 12,800 libras de fuerza, capaz de triturar huesos con
+      facilidad!"
+    hindi: "\u091F\u0940-\u0930\u0947\u0915\u094D\u0938 \u0915\u0947 \u092A\u093E\u0938
+      \u0907\u0924\u093F\u0939\u093E\u0938 \u092E\u0947\u0902 \u0915\u093F\u0938\u0940
+      \u092D\u0940 \u0938\u094D\u0925\u0932\u0940\u092F \u091C\u0940\u0935 \u0915\u0940
+      \u0924\u0941\u0932\u0928\u093E \u092E\u0947\u0902 \u0938\u092C\u0938\u0947
+      \u092E\u091C\u092C\u0942\u0924 \u0915\u093E\u091F\u0928\u0947 \u0915\u093E
+      \u092C\u0932 (12,800 \u092A\u093E\u0909\u0902\u0921 \u0938\u0947 \u0905\u0927\u093F\u0915)
+      \u0925\u093E!"
+  thumbnail: {fileID: 21300000, guid: e8d17a967ae3bfb4e88feab8084c9942, type: 3}
   image2D: {fileID: 21300000, guid: 516b1633ee77da74292a6e36baed9a64, type: 3}
   roarClip: {fileID: 8300000, guid: 2280792563b732345bd934f281f472ac, type: 3}
   ambientClip: {fileID: 0}

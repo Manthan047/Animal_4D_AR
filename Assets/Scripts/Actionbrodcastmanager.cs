@@ -11,7 +11,7 @@ public class ActionBroadcastManager : MonoBehaviour
         }
 
         // Fallback polymorphism
-        var allBehaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+        var allBehaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude);
         foreach (var mb in allBehaviours)
         {
             if (mb is IAnimalAction animal && mb.gameObject.activeInHierarchy)
@@ -29,7 +29,7 @@ public class ActionBroadcastManager : MonoBehaviour
             return;
         }
 
-        var allBehaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+        var allBehaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude);
         foreach (var mb in allBehaviours)
         {
             if (mb is IAnimalAction animal && mb.gameObject.activeInHierarchy)

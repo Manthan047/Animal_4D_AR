@@ -78,7 +78,10 @@ public class Stego : MonoBehaviour, IAnimalAction
 
         animator.enabled = true;
         animator.SetLayerWeight(defaultStateLayer, 1f);
-        animator.Play(defaultStateName, defaultStateLayer, 0f);
+        if (animator.HasState(defaultStateLayer, Animator.StringToHash(defaultStateName)))
+        {
+            animator.Play(defaultStateName, defaultStateLayer, 0f);
+        }
 
         // Force immediate evaluation so the state actually lands on
         // Blend Tree before anything else (e.g. a manager callback on

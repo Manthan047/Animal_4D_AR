@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 // Renders a standalone, rotatable 3D model into a mini viewer window in the UI,
 // completely independent of AR image tracking.
@@ -21,14 +22,20 @@ public class ModelPreviewController : MonoBehaviour, IBeginDragHandler, IDragHan
     [Tooltip("Every spawned model is uniformly scaled so its bounding box diagonal equals this many world units, then re-centered on ModelAnchor.")]
     [SerializeField] private float desiredPreviewSize = 2f;
 
-    [Header("Zoom")]
+    [Header("Zoom Speed")]
     [Tooltip("How much each mouse-wheel scroll tick zooms in/out.")]
     [SerializeField] private float scrollZoomSensitivity = 0.1f;
     [Tooltip("How much a pinch gesture zooms in/out.")]
     [SerializeField] private float pinchZoomSensitivity = 0.01f;
-    [Tooltip("Zoom multiplier applied on top of the auto-framed base scale.")]
-    [SerializeField] private float minZoomFactor = 0.5f;
-    [SerializeField] private float maxZoomFactor = 3f;
+
+    [Header("Zoom Limits")]
+    [Tooltip("ZOOM OUT LIMIT. Smallest size the model can shrink to. 1 = the default framed size, 0.5 = half size, 0.2 = very small. Lower value = can zoom out more.")]
+    [FormerlySerializedAs("minZoomFactor")]
+    [SerializeField, Range(0.05f, 1f)] private float zoomOutLimit = 0.5f;
+
+    [Tooltip("ZOOM IN LIMIT. Largest size the model can grow to. 1 = the default framed size, 3 = three times bigger.")]
+    [FormerlySerializedAs("maxZoomFactor")]
+    [SerializeField, Range(1f, 10f)] private float zoomInLimit = 3f;
 
     private GameObject currentInstance;
     private bool isDragging;
@@ -41,6 +48,13 @@ public class ModelPreviewController : MonoBehaviour, IBeginDragHandler, IDragHan
     // model, so zooming never fights the auto-framing logic.
     private Vector3 baseScale = Vector3.one;
     private float currentZoomFactor = 1f;
+
+    // Keeps the limits valid when edited in the Inspector.
+    private void OnValidate()
+    {
+        zoomOutLimit = Mathf.Clamp(zoomOutLimit, 0.05f, 1f);
+        zoomInLimit = Mathf.Max(zoomInLimit, 1f);
+    }
 
     private void Update()
     {
@@ -203,6 +217,17 @@ public class ModelPreviewController : MonoBehaviour, IBeginDragHandler, IDragHan
         }
     }
 
+    /// <summary>
+    /// Returns the model to its default framed size.
+    /// </summary>
+    public void ResetZoom()
+    {
+        if (currentInstance == null) return;
+
+        currentZoomFactor = 1f;
+        currentInstance.transform.localScale = baseScale;
+    }
+
     private static void SetLayerRecursively(GameObject go, int layer)
     {
         if (layer < 0) return;
@@ -259,7 +284,8 @@ public class ModelPreviewController : MonoBehaviour, IBeginDragHandler, IDragHan
     {
         if (currentInstance == null) return;
 
-        currentZoomFactor = Mathf.Clamp(currentZoomFactor + zoomIncrement, minZoomFactor, maxZoomFactor);
+        // Zoom out limit (smallest) and zoom in limit (largest) come from the Inspector.
+        currentZoomFactor = Mathf.Clamp(currentZoomFactor + zoomIncrement, zoomOutLimit, zoomInLimit);
         currentInstance.transform.localScale = baseScale * currentZoomFactor;
     }
 }

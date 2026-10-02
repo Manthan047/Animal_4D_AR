@@ -1,12 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+using LightSide; // UniText namespace
 
 public class AnimalCard : MonoBehaviour
 {
     [Header("UI Elements")]
     public Image cardImage;
-    public TMP_Text cardNameText;
+    public UniText cardNameText;
     public Button cardButton;
     public Image selectionBorder;
 
@@ -17,12 +17,47 @@ public class AnimalCard : MonoBehaviour
 
 
     // =========================================================
-    // AWAKE
+    // LIFECYCLE
     // =========================================================
 
     private void Awake()
     {
         AutoFindReferences();
+    }
+
+    private void OnEnable()
+    {
+        if (LanguageManager.Instance != null)
+        {
+            LanguageManager.Instance.OnLanguageChanged -= HandleLanguageChanged;
+            LanguageManager.Instance.OnLanguageChanged += HandleLanguageChanged;
+        }
+
+        UpdateCardText();
+    }
+
+    private void OnDisable()
+    {
+        if (LanguageManager.Instance != null)
+        {
+            LanguageManager.Instance.OnLanguageChanged -= HandleLanguageChanged;
+        }
+    }
+
+    private void HandleLanguageChanged(string newLang)
+    {
+        UpdateCardText();
+    }
+
+    public void UpdateCardText()
+    {
+        if (cardNameText == null)
+            AutoFindReferences();
+
+        if (cardNameText != null && animalData != null)
+        {
+            cardNameText.Text = animalData.GetLocalizedName();
+        }
     }
 
 
@@ -32,101 +67,54 @@ public class AnimalCard : MonoBehaviour
 
     private void AutoFindReferences()
     {
-        // -----------------------------------------------------
         // SKETCH IMAGE
-        // -----------------------------------------------------
-
         if (cardImage == null)
         {
-            Transform imageTransform =
-                transform.Find("SketchImage");
+            Transform imageTransform = transform.Find("SketchImage");
 
             if (imageTransform != null)
-            {
-                cardImage =
-                    imageTransform.GetComponent<Image>();
-            }
+                cardImage = imageTransform.GetComponent<Image>();
         }
 
-
-        // -----------------------------------------------------
         // CARD NAME
-        // -----------------------------------------------------
-
         if (cardNameText == null)
         {
-            Transform nameTransform =
-                transform.Find("CardName");
+            Transform nameTransform = transform.Find("CardName");
 
             if (nameTransform != null)
-            {
-                cardNameText =
-                    nameTransform.GetComponent<TMP_Text>();
-            }
+                cardNameText = nameTransform.GetComponent<UniText>();
+
+            if (cardNameText == null)
+                cardNameText = GetComponentInChildren<UniText>(true);
         }
 
-
-        // -----------------------------------------------------
         // BUTTON
-        // -----------------------------------------------------
-
         if (cardButton == null)
         {
-            cardButton =
-                GetComponent<Button>();
+            cardButton = GetComponent<Button>();
 
             if (cardButton == null)
-            {
-                cardButton =
-                    GetComponentInChildren<Button>();
-            }
+                cardButton = GetComponentInChildren<Button>();
         }
 
-
-        // -----------------------------------------------------
         // SELECTION BORDER
-        // -----------------------------------------------------
-
         if (selectionBorder == null)
         {
-            Transform borderTransform =
-                transform.Find("SelectionBorder");
+            Transform borderTransform = transform.Find("SelectionBorder");
 
             if (borderTransform != null)
-            {
-                selectionBorder =
-                    borderTransform.GetComponent<Image>();
-            }
+                selectionBorder = borderTransform.GetComponent<Image>();
         }
 
-
-        // -----------------------------------------------------
         // WARNINGS
-        // -----------------------------------------------------
-
         if (cardImage == null)
-        {
-            Debug.LogWarning(
-                "[AnimalCard] SketchImage Image not found on " +
-                gameObject.name
-            );
-        }
+            Debug.LogWarning("[AnimalCard] SketchImage Image not found on " + gameObject.name);
 
         if (cardNameText == null)
-        {
-            Debug.LogWarning(
-                "[AnimalCard] CardName TMP_Text not found on " +
-                gameObject.name
-            );
-        }
+            Debug.LogWarning("[AnimalCard] CardName UniText not found on " + gameObject.name);
 
         if (cardButton == null)
-        {
-            Debug.LogWarning(
-                "[AnimalCard] Button not found on " +
-                gameObject.name
-            );
-        }
+            Debug.LogWarning("[AnimalCard] Button not found on " + gameObject.name);
     }
 
 
@@ -143,112 +131,56 @@ public class AnimalCard : MonoBehaviour
 
         AutoFindReferences();
 
-
         if (data == null)
-        {
             return;
-        }
 
 
-        // -----------------------------------------------------
         // NAME
-        // -----------------------------------------------------
-
-        if (cardNameText != null)
-        {
-            cardNameText.text =
-                data.animalName;
-        }
+        UpdateCardText();
 
 
-        // -----------------------------------------------------
         // IMAGE
-        // -----------------------------------------------------
-
         if (cardImage != null)
         {
-            Sprite targetSprite =
-                data.thumbnail;
+            Sprite targetSprite = data.thumbnail;
 
-
-            // -------------------------------------------------
             // FALLBACK SKETCH
-            // -------------------------------------------------
-
             if (targetSprite == null)
             {
-                string name =
-                    data.animalName.ToLower();
-
+                // Use the English name as the stable lookup key,
+                // regardless of which language is currently displayed.
+                string name = data.animalName.english.ToLower();
 
                 if (name.Contains("rex"))
-                {
-                    targetSprite =
-                        Resources.Load<Sprite>(
-                            "Sketches/rex_sketch"
-                        );
-                }
+                    targetSprite = Resources.Load<Sprite>("Sketches/rex_sketch");
                 else if (name.Contains("ankylo"))
-                {
-                    targetSprite =
-                        Resources.Load<Sprite>(
-                            "Sketches/ankylosaurus_sketch"
-                        );
-                }
+                    targetSprite = Resources.Load<Sprite>("Sketches/ankylosaurus_sketch");
                 else if (name.Contains("stego"))
-                {
-                    targetSprite =
-                        Resources.Load<Sprite>(
-                            "Sketches/stegosaurus_sketch"
-                        );
-                }
+                    targetSprite = Resources.Load<Sprite>("Sketches/stegosaurus_sketch");
             }
 
-
-            // -------------------------------------------------
             // APPLY IMAGE
-            // -------------------------------------------------
-
             if (targetSprite != null)
             {
-                cardImage.sprite =
-                    targetSprite;
-
-                cardImage.preserveAspect =
-                    true;
-
-                cardImage.color =
-                    Color.white;
-
-                cardImage.enabled =
-                    true;
+                cardImage.sprite = targetSprite;
+                cardImage.preserveAspect = true;
+                cardImage.color = Color.white;
+                cardImage.enabled = true;
             }
             else
             {
-                Debug.LogWarning(
-                    "[AnimalCard] No thumbnail found for " +
-                    data.animalName
-                );
-
-                cardImage.enabled =
-                    false;
+                Debug.LogWarning("[AnimalCard] No thumbnail found for " + data.animalName.english);
+                cardImage.enabled = false;
             }
         }
 
 
-        // -----------------------------------------------------
         // BUTTON CLICK
-        // -----------------------------------------------------
-
         if (cardButton != null)
         {
             cardButton.onClick.RemoveAllListeners();
-
-            cardButton.onClick.AddListener(
-                HandleCardClicked
-            );
+            cardButton.onClick.AddListener(HandleCardClicked);
         }
-
 
         // Start unselected
         SetSelected(false);
@@ -263,26 +195,14 @@ public class AnimalCard : MonoBehaviour
     {
         if (animalData == null)
         {
-            Debug.LogWarning(
-                "[AnimalCard] No AnimalData assigned."
-            );
-
+            Debug.LogWarning("[AnimalCard] No AnimalData assigned.");
             return;
         }
 
-
-        Debug.Log(
-            "[AnimalCard] Clicked: " +
-            animalData.animalName
-        );
-
+        Debug.Log("[AnimalCard] Clicked: " + animalData.animalName.english);
 
         if (onSelectCallback != null)
-        {
-            onSelectCallback.Invoke(
-                animalData
-            );
-        }
+            onSelectCallback.Invoke(animalData);
     }
 
 
@@ -293,16 +213,10 @@ public class AnimalCard : MonoBehaviour
     public void SetSelected(bool isSelected)
     {
         if (selectionBorder != null)
-        {
-            selectionBorder.gameObject.SetActive(
-                isSelected
-            );
-        }
+            selectionBorder.gameObject.SetActive(isSelected);
 
-
-        transform.localScale =
-            isSelected
-                ? new Vector3(1.05f, 1.05f, 1f)
-                : Vector3.one;
+        transform.localScale = isSelected
+            ? new Vector3(1.05f, 1.05f, 1f)
+            : Vector3.one;
     }
 }

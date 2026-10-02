@@ -12,26 +12,177 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22ab2b58f409ecb488e403e3ccfd90f3, type: 3}
   m_Name: AnkylosaurusData
   m_EditorClassIdentifier: Assembly-CSharp::AnimalData
-  animalName: Ankylosaurus
+  animalName:
+    english: Ankylosaurus
+    spanish: Anquilosaurio
+    hindi: "\u090F\u0902\u0915\u093E\u0907\u0932\u094B\u0938\u0949\u0930\u0938"
   scientificName: Ankylosaurus magniventris
-  classification: Armored Herbivore (Plant Eater)
-  era: Late Cretaceous (~68 - 66 Million Years Ago)
+  classification:
+    english: Armored Herbivore (Living Fortress)
+    spanish: "Herb\xEDvoro Acorazado (Fortaleza Viviente)"
+    hindi: "\u0915\u0935\u091A\u0927\u093E\u0930\u0940 \u0936\u093E\u0915\u093E\u0939\u093E\u0930\u0940
+      (\u091C\u0940\u0935\u093F\u0924 \u0915\u093F\u0932\u093E)"
+  era:
+    english: "Late Cretaceous (~68 \u2013 66 Million Years Ago)"
+    spanish: "Cret\xE1cico Tard\xEDo (~68 \u2013 66 millones de a\xF1os atr\xE1s)"
+    hindi: "\u0909\u0924\u094D\u0924\u0930 \u0915\u094D\u0930\u0947\u091F\u0947\u0936\u093F\u092F\u0938
+      \u0915\u093E\u0932 (~6.8 \u2013 6.6 \u0915\u0930\u094B\u0921\u093C \u0935\u0930\u094D\u0937
+      \u092A\u0942\u0930\u094D\u0935)"
   averageLength: 8.0 meters (26 ft)
   averageWeight: 6,000 kg (6 metric tons)
-  description: 'Ankylosaurus was a heavily armored herbivore that coexisted alongside
-    Tyrannosaurus Rex, acting as the living tank of the Late Cretaceous ecosystem.
-    Measuring roughly 25 to 30 feet in length, its low-slung, broad body was covered
-    from head to tail in a fortress of thick osteoderms, bony plates, and fused armor
-    embedded directly into its skin. Even its eyelids were protected by bony plates,
-    leaving almost no vulnerable soft tissue exposed to attacking predators. If a
-    carnivore attempted an ambush, Ankylosaurus could hunker down to protect its
-    unarmored underbelly and swing its signature defense weapon: a massive, heavy
-    tail club formed from fused vertebrae and solid bone. A single powerful blow
-    from this club was fully capable of shattering the legs or ribs of any pursuing
-    predator.'
-  funFact: Ankylosaurus wielded a massive club of solid bone at the end of its tail,
-    powerful enough to break the leg bones of an attacking T-Rex!
-  thumbnail: {fileID: 21300000, guid: 6c28ef9b4ecfc644096e8bf2634f5499, type: 3}
+  description:
+    english: 'Overview: Ankylosaurus lived in the very last days of the dinosaurs,
+      about 68 to 66 million years ago, in western North America. It shared its world
+      with Tyrannosaurus rex. It is the best-known member of the armored dinosaurs
+      called ankylosaurs.
+
+
+      Body: It was about 6 to 8 meters (20 to 26 ft)
+      long and weighed about 4,000 to 8,000 kg, so it was low, wide and heavy, like
+      a living tank. Its back, neck and sides were covered with thick bony plates
+      called osteoderms, set into the skin. Its skull was wide and triangular, with
+      horn-like corners and armor over its face. Some ankylosaurs even had bony eyelids.
+
+
+      The
+      tail club: At the end of its stiffened tail was a heavy knob of fused bone.
+      Swung from side to side, it could deliver a hard blow, and some scientists
+      think it could break the leg bones of a predator.
+
+
+      Diet and behavior:
+      Ankylosaurus ate plants. It had a broad beak and small, leaf-shaped teeth,
+      and a very wide belly to digest tough vegetation. Its nasal passages were long
+      and looped, which may have helped with smell, cooling the air it breathed,
+      or making deep sounds.
+
+
+      Discovery: The first fossils were found in Montana
+      in 1906 and named in 1908 by the paleontologist Barnum Brown. Only a small
+      number of skeletons have ever been found, so some details about it are still
+      uncertain.
+
+
+      Fun fact: Armor was not just on its back. Even its eyelids
+      may have been protected, which made it very hard for a predator like T. rex
+      to attack.'
+    spanish: "Descripci\xF3n general: El anquilosaurio vivi\xF3 en los \xFAltimos
+      d\xEDas de los dinosaurios, hace aproximadamente entre 68 y 66 millones de
+      a\xF1os, en el oeste de Norteam\xE9rica. Comparti\xF3 su mundo con el tiranosaurio
+      rex. Es el miembro m\xE1s conocido de los dinosaurios acorazados llamados anquilosaurios.\r\n\r\nCuerpo:
+      Med\xEDa entre 6 y 8 metros de largo y pesaba entre 4000 y 8000 kg, por lo
+      que era bajo, ancho y pesado, como un tanque viviente. Su espalda, cuello y
+      costados estaban cubiertos de gruesas placas \xF3seas llamadas osteodermos,
+      insertadas en la piel. Su cr\xE1neo era ancho y triangular, con esquinas en
+      forma de cuerno y una armadura en la cara. Algunos anquilosaurios incluso ten\xEDan
+      p\xE1rpados \xF3seos.\r\n\r\nLa maza de la cola: En el extremo de su cola r\xEDgida
+      hab\xEDa una pesada protuberancia de hueso fusionado. Al balancearla de lado
+      a lado, pod\xEDa asestar un fuerte golpe, y algunos cient\xEDficos creen que
+      pod\xEDa fracturar los huesos de las patas de un depredador.\r\n\r\nDieta y
+      comportamiento: El anquilosaurio se alimentaba de plantas. Pose\xEDa un pico
+      ancho y dientes peque\xF1os con forma de hoja, adem\xE1s de un vientre muy
+      amplio para digerir vegetaci\xF3n fibrosa. Sus fosas nasales eran largas y
+      curvas, lo que posiblemente le ayudaba a percibir olores, a enfriar el aire
+      que respiraba o a emitir sonidos graves.\r\n\r\nDescubrimiento: Los primeros
+      f\xF3siles se encontraron en Montana en 1906 y fueron nombrados en 1908 por
+      el paleont\xF3logo Barnum Brown. Solo se han encontrado unos pocos esqueletos,
+      por lo que algunos detalles sobre \xE9l a\xFAn son inciertos.\r\n\r\nDato curioso:
+      Su armadura no se limitaba a la espalda. Incluso sus p\xE1rpados podr\xEDan
+      haber estado protegidos, lo que dificultaba enormemente los ataques de depredadores
+      como el T. rex."
+    hindi: "\u0938\u0902\u0915\u094D\u0937\u093F\u092A\u094D\u0924 \u0935\u093F\u0935\u0930\u0923:
+      \u090F\u0902\u0915\u093F\u0932\u094B\u0938\u0949\u0930\u0938 \u0921\u093E\u092F\u0928\u093E\u0938\u094B\u0930\u094B\u0902
+      \u0915\u0947 \u0905\u0902\u0924\u093F\u092E \u0926\u093F\u0928\u094B\u0902
+      \u092E\u0947\u0902, \u0932\u0917\u092D\u0917 68 \u0938\u0947 66 \u092E\u093F\u0932\u093F\u092F\u0928
+      \u0935\u0930\u094D\u0937 \u092A\u0942\u0930\u094D\u0935, \u092A\u0936\u094D\u091A\u093F\u092E\u0940
+      \u0909\u0924\u094D\u0924\u0930\u0940 \u0905\u092E\u0947\u0930\u093F\u0915\u093E
+      \u092E\u0947\u0902 \u0930\u0939\u0924\u093E \u0925\u093E\u0964 \u092F\u0939
+      \u091F\u093E\u092F\u0930\u0947\u0928\u094B\u0938\u0949\u0930\u0938 \u0930\u0947\u0915\u094D\u0938
+      \u0915\u0947 \u0938\u093E\u0925 \u0930\u0939\u0924\u093E \u0925\u093E\u0964
+      \u092F\u0939 \u0915\u0935\u091A\u0927\u093E\u0930\u0940 \u0921\u093E\u092F\u0928\u093E\u0938\u094B\u0930\u094B\u0902
+      \u0915\u0947 \u090F\u0902\u0915\u093F\u0932\u094B\u0938\u0949\u0930\u0938 \u0938\u092E\u0942\u0939
+      \u0915\u093E \u0938\u092C\u0938\u0947 \u092A\u094D\u0930\u0938\u093F\u0926\u094D\u0927
+      \u0938\u0926\u0938\u094D\u092F \u0939\u0948\u0964\r\n\r\n\u0936\u0930\u0940\u0930:
+      \u092F\u0939 \u0932\u0917\u092D\u0917 6 \u0938\u0947 8 \u092E\u0940\u091F\u0930
+      (20 \u0938\u0947 26 \u092B\u0940\u091F) \u0932\u0902\u092C\u093E \u0914\u0930
+      \u0932\u0917\u092D\u0917 4,000 \u0938\u0947 8,000 \u0915\u093F\u0932\u094B\u0917\u094D\u0930\u093E\u092E
+      \u092D\u093E\u0930\u0940 \u0925\u093E, \u0907\u0938\u0932\u093F\u090F \u092F\u0939
+      \u090F\u0915 \u091A\u0932\u0924\u0947-\u092B\u093F\u0930\u0924\u0947 \u091F\u0948\u0902\u0915
+      \u0915\u0940 \u0924\u0930\u0939 \u091B\u094B\u091F\u093E, \u091A\u094C\u0921\u093C\u093E
+      \u0914\u0930 \u092D\u093E\u0930\u0940 \u0925\u093E\u0964 \u0907\u0938\u0915\u0940
+      \u092A\u0940\u0920, \u0917\u0930\u094D\u0926\u0928 \u0914\u0930 \u0915\u093F\u0928\u093E\u0930\u0947
+      \u0924\u094D\u0935\u091A\u093E \u092E\u0947\u0902 \u0927\u0902\u0938\u0940
+      \u0939\u0941\u0908 \u0911\u0938\u094D\u091F\u093F\u092F\u094B\u0921\u0930\u094D\u092E
+      \u0928\u093E\u092E\u0915 \u092E\u094B\u091F\u0940 \u0939\u0921\u094D\u0921\u0940
+      \u0915\u0940 \u092A\u094D\u0932\u0947\u091F\u094B\u0902 \u0938\u0947 \u0922\u0915\u0947
+      \u0939\u0941\u090F \u0925\u0947\u0964 \u0907\u0938\u0915\u0940 \u0916\u094B\u092A\u0921\u093C\u0940
+      \u091A\u094C\u0921\u093C\u0940 \u0914\u0930 \u0924\u094D\u0930\u093F\u0915\u094B\u0923\u0940\u092F
+      \u0925\u0940, \u091C\u093F\u0938\u0915\u0947 \u0915\u094B\u0928\u0947 \u0938\u0940\u0902\u0917
+      \u091C\u0948\u0938\u0947 \u0925\u0947 \u0914\u0930 \u091A\u0947\u0939\u0930\u0947
+      \u092A\u0930 \u0915\u0935\u091A \u0925\u093E\u0964 \u0915\u0941\u091B \u090F\u0902\u0915\u093F\u0932\u094B\u0938\u0949\u0930\u0938
+      \u0915\u0940 \u092A\u0932\u0915\u0947\u0902 \u092D\u0940 \u0939\u0921\u094D\u0921\u0940
+      \u0915\u0940 \u092C\u0928\u0940 \u0939\u0941\u0908 \u0925\u0940\u0902\u0964\r\n\r\n\u092A\u0942\u0902\u091B
+      \u0915\u093E \u0915\u094D\u0932\u092C: \u0907\u0938\u0915\u0940 \u0915\u0920\u094B\u0930
+      \u092A\u0942\u0902\u091B \u0915\u0947 \u0938\u093F\u0930\u0947 \u092A\u0930
+      \u091C\u0941\u0921\u093C\u0940 \u0939\u0941\u0908 \u0939\u0921\u094D\u0921\u0940
+      \u0915\u093E \u090F\u0915 \u092D\u093E\u0930\u0940 \u0917\u0941\u091A\u094D\u091B\u093E
+      \u0925\u093E\u0964 \u0907\u0938\u0947 \u0905\u0917\u0932-\u092C\u0917\u0932
+      \u0918\u0941\u092E\u093E\u0915\u0930 \u092F\u0939 \u091C\u094B\u0930\u0926\u093E\u0930
+      \u092A\u094D\u0930\u0939\u093E\u0930 \u0915\u0930 \u0938\u0915\u0924\u093E
+      \u0925\u093E, \u0914\u0930 \u0915\u0941\u091B \u0935\u0948\u091C\u094D\u091E\u093E\u0928\u093F\u0915\u094B\u0902
+      \u0915\u093E \u092E\u093E\u0928\u0928\u093E \u200B\u200B\u0939\u0948 \u0915\u093F
+      \u092F\u0939 \u0936\u093F\u0915\u093E\u0930\u0940 \u0915\u0940 \u091F\u093E\u0902\u0917\u094B\u0902
+      \u0915\u0940 \u0939\u0921\u094D\u0921\u093F\u092F\u094B\u0902 \u0915\u094B
+      \u0924\u094B\u0921\u093C \u0938\u0915\u0924\u093E \u0925\u093E\u0964\r\n\r\n\r\n\u0906\u0939\u093E\u0930
+      \u0914\u0930 \u0935\u094D\u092F\u0935\u0939\u093E\u0930: \u090F\u0902\u0915\u093F\u0932\u094B\u0938\u0949\u0930\u0938
+      \u092A\u094C\u0927\u0947 \u0916\u093E\u0924\u093E \u0925\u093E\u0964 \u0907\u0938\u0915\u0940
+      \u091A\u094B\u0902\u091A \u091A\u094C\u0921\u093C\u0940 \u0925\u0940 \u0914\u0930
+      \u0926\u093E\u0902\u0924 \u091B\u094B\u091F\u0947, \u092A\u0924\u094D\u0924\u0940
+      \u0915\u0947 \u0906\u0915\u093E\u0930 \u0915\u0947 \u0925\u0947, \u0938\u093E\u0925
+      \u0939\u0940 \u0907\u0938\u0915\u093E \u092A\u0947\u091F \u092D\u0940 \u0915\u093E\u092B\u0940
+      \u091A\u094C\u0921\u093C\u093E \u0925\u093E \u0924\u093E\u0915\u093F \u092F\u0939
+      \u0915\u0920\u094B\u0930 \u0935\u0928\u0938\u094D\u092A\u0924\u093F\u092F\u094B\u0902
+      \u0915\u094B \u092A\u091A\u093E \u0938\u0915\u0947\u0964 \u0907\u0938\u0915\u0947
+      \u0928\u093E\u0915 \u0915\u0947 \u092E\u093E\u0930\u094D\u0917 \u0932\u0902\u092C\u0947
+      \u0914\u0930 \u0918\u0941\u092E\u093E\u0935\u0926\u093E\u0930 \u0925\u0947,
+      \u091C\u094B \u0936\u093E\u092F\u0926 \u0938\u0942\u0902\u0918\u0928\u0947,
+      \u0938\u093E\u0902\u0938 \u0932\u0947\u0928\u0947 \u0935\u093E\u0932\u0940
+      \u0939\u0935\u093E \u0915\u094B \u0920\u0902\u0921\u093E \u0915\u0930\u0928\u0947
+      \u092F\u093E \u0917\u0939\u0930\u0940 \u0906\u0935\u093E\u091C\u0947\u0902
+      \u0928\u093F\u0915\u093E\u0932\u0928\u0947 \u092E\u0947\u0902 \u0938\u0939\u093E\u092F\u0915
+      \u0939\u094B\u0924\u0947 \u0925\u0947\u0964\r\n\r\n\u0916\u094B\u091C: \u0907\u0938\u0915\u0947
+      \u092A\u0939\u0932\u0947 \u091C\u0940\u0935\u093E\u0936\u094D\u092E 1906 \u092E\u0947\u0902
+      \u092E\u094B\u0902\u091F\u093E\u0928\u093E \u092E\u0947\u0902 \u092A\u093E\u090F
+      \u0917\u090F \u0914\u0930 1908 \u092E\u0947\u0902 \u091C\u0940\u0935\u093E\u0936\u094D\u092E
+      \u0935\u093F\u091C\u094D\u091E\u093E\u0928\u0940 \u092C\u093E\u0930\u094D\u0928\u092E
+      \u092C\u094D\u0930\u093E\u0909\u0928 \u0928\u0947 \u0907\u0938\u0915\u093E
+      \u0928\u093E\u092E\u0915\u0930\u0923 \u0915\u093F\u092F\u093E\u0964 \u0907\u0938\u0915\u0947
+      \u0915\u0947\u0935\u0932 \u0915\u0941\u091B \u0939\u0940 \u0915\u0902\u0915\u093E\u0932
+      \u092E\u093F\u0932\u0947 \u0939\u0948\u0902, \u0907\u0938\u0932\u093F\u090F
+      \u0907\u0938\u0915\u0947 \u092C\u093E\u0930\u0947 \u092E\u0947\u0902 \u0915\u0941\u091B
+      \u0935\u093F\u0935\u0930\u0923 \u0905\u092D\u0940 \u092D\u0940 \u0905\u0928\u093F\u0936\u094D\u091A\u093F\u0924
+      \u0939\u0948\u0902\u0964\r\n\r\n\u0930\u094B\u091A\u0915 \u0924\u0925\u094D\u092F:
+      \u0915\u0935\u091A \u0915\u0947\u0935\u0932 \u0907\u0938\u0915\u0940 \u092A\u0940\u0920
+      \u092A\u0930 \u0939\u0940 \u0928\u0939\u0940\u0902 \u0925\u093E\u0964 \u0907\u0938\u0915\u0940
+      \u092A\u0932\u0915\u0947\u0902 \u092D\u0940 \u0936\u093E\u092F\u0926 \u0938\u0941\u0930\u0915\u094D\u0937\u093F\u0924
+      \u0925\u0940\u0902, \u091C\u093F\u0938\u0938\u0947 \u091F\u0940. \u0930\u0947\u0915\u094D\u0938
+      \u091C\u0948\u0938\u0947 \u0936\u093F\u0915\u093E\u0930\u0940 \u0915\u0947
+      \u0932\u093F\u090F \u0907\u0938 \u092A\u0930 \u0939\u092E\u0932\u093E \u0915\u0930\u0928\u093E
+      \u092C\u0939\u0941\u0924 \u092E\u0941\u0936\u094D\u0915\u093F\u0932 \u0939\u094B
+      \u091C\u093E\u0924\u093E \u0925\u093E\u0964"
+  funFact:
+    english: Even the eyelids of an Ankylosaurus had armored bone protection, making
+      it virtually impervious to attacks from large predators like T-Rex!
+    spanish: "\xA1Incluso los p\xE1rpados del anquilosaurio ten\xEDan placas de hueso
+      protectoras, haci\xE9ndolo casi invencible frente a los ataques del T-Rex!"
+    hindi: "\u090F\u0902\u0915\u093E\u0907\u0932\u094B\u0938\u0949\u0930\u0938 \u0915\u0940
+      \u092A\u0932\u0915\u094B\u0902 \u092A\u0930 \u092D\u0940 \u0938\u0941\u0930\u0915\u094D\u0937\u093E\u0924\u094D\u092E\u0915
+      \u0939\u0921\u094D\u0921\u0940 \u0915\u0940 \u092A\u0930\u0924 \u0925\u0940,
+      \u091C\u093F\u0938\u0938\u0947 \u091F\u0940-\u0930\u0947\u0915\u094D\u0938
+      \u091C\u0948\u0938\u0947 \u0936\u093F\u0915\u093E\u0930\u0940 \u092D\u0940
+      \u0907\u0938\u0947 \u0928\u0941\u0915\u0938\u093E\u0928 \u0928\u0939\u0940\u0902
+      \u092A\u0939\u0941\u0902\u091A\u093E \u092A\u093E\u0924\u0947 \u0925\u0947!"
+  thumbnail: {fileID: 21300000, guid: fb4bfef5e90d1bf4c849b9c2936c3235, type: 3}
   image2D: {fileID: 21300000, guid: cd3e18660dfc02b40a90d42db70086b1, type: 3}
   roarClip: {fileID: 8300000, guid: f0e9939d181850645b7b9b40bb5d0cc2, type: 3}
   ambientClip: {fileID: 0}
