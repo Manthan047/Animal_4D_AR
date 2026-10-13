@@ -4,38 +4,27 @@ using UnityEngine;
 
 public class ARAnimalManager : MonoBehaviour
 {
-
-  
-
-
     public static ARAnimalManager Instance { get; private set; }
 
     public event Action<IAnimalAction> OnAnimalTracked;
     public event Action<IAnimalAction> OnAnimalLost;
     public event Action<IAnimalAction> OnSelectedAnimalChanged;
 
-    private readonly List<IAnimalAction> activeTrackedAnimals =
-        new List<IAnimalAction>();
+    private readonly List<IAnimalAction> activeTrackedAnimals = new List<IAnimalAction>();
 
     [Header("Selection Settings")]
-
-    [Tooltip(
-        "If true, a newly detected animal automatically becomes selected. " +
-        "If false, the first detected animal is selected only when nothing is selected."
-    )]
+    [Tooltip("If true, a newly detected animal automatically becomes selected.")]
     [SerializeField] private bool autoSelectNewlyDetected = true;
+
+    [Tooltip("If true, only ONE animal can be active at a time. " +
+             "A newly detected animal hides the previous one (model, buttons, audio).")]
+    [SerializeField] private bool singleActiveAnimal = true;
 
     private IAnimalAction selectedAnimal;
 
-    public IReadOnlyList<IAnimalAction> ActiveTrackedAnimals =>
-        activeTrackedAnimals;
-
-    public IAnimalAction SelectedAnimal =>
-        selectedAnimal;
-
-    public bool HasActiveAnimal =>
-        activeTrackedAnimals.Count > 0;
-
+    public IReadOnlyList<IAnimalAction> ActiveTrackedAnimals => activeTrackedAnimals;
+    public IAnimalAction SelectedAnimal => selectedAnimal;
+    public bool HasActiveAnimal => activeTrackedAnimals.Count > 0;
 
     // =========================================================
     // UNITY
@@ -50,12 +39,8 @@ public class ARAnimalManager : MonoBehaviour
         }
 
         Instance = this;
-
-        // IMPORTANT:
-        // Start with nothing selected.
         selectedAnimal = null;
     }
-
 
     // =========================================================
     // ANIMAL TRACKED
@@ -63,37 +48,37 @@ public class ARAnimalManager : MonoBehaviour
 
     public void RegisterTrackedAnimal(IAnimalAction animal)
     {
-        if (animal == null)
-            return;
+        if (animal == null) return;
+        if (activeTrackedAnimals.Contains(animal)) return;
 
-         Debug.Log($"[DEBUG] RegisterTrackedAnimal called for: {animal.AnimalName}"); 
+        // FIX: hide every previously active animal first
+        if (singleActiveAnimal)
+        {
+            // copy the list because we modify it while looping
+            var previous = new List<IAnimalAction>(activeTrackedAnimals);
 
-        if (activeTrackedAnimals.Contains(animal))
-            return;
+            foreach (IAnimalAction other in previous)
+            {
+                if (other == null) continue;
 
+                other.IsTracked = false;   // hides model, buttons, stops audio
+                activeTrackedAnimals.Remove(other);
+                OnAnimalLost?.Invoke(other);
+            }
+        }
 
         activeTrackedAnimals.Add(animal);
 
-        Debug.Log(
-            $"[ARAnimalManager] Animal registered: " +
-            $"{animal.AnimalName}. " +
-            $"Total tracked: {activeTrackedAnimals.Count}"
-        );
-
+        Debug.Log($"[ARAnimalManager] Registered: {animal.AnimalName}. " +
+                  $"Total tracked: {activeTrackedAnimals.Count}");
 
         OnAnimalTracked?.Invoke(animal);
 
-
-        // -----------------------------------------------------
-        // SELECT DETECTED ANIMAL
-        // -----------------------------------------------------
-
-        if (selectedAnimal == null || autoSelectNewlyDetected)
+        if (selectedAnimal == null || autoSelectNewlyDetected || singleActiveAnimal)
         {
             SelectAnimal(animal);
         }
     }
-
 
     // =========================================================
     // ANIMAL LOST
@@ -101,189 +86,98 @@ public class ARAnimalManager : MonoBehaviour
 
     public void UnregisterTrackedAnimal(IAnimalAction animal)
     {
-        if (animal == null)
-            return;
+        if (animal == null) return;
 
-        if (!activeTrackedAnimals.Contains(animal))
-            return;
-
+        // A late "lost" event from an already-hidden card is ignored here
+        if (!activeTrackedAnimals.Contains(animal)) return;
 
         activeTrackedAnimals.Remove(animal);
 
-        Debug.Log(
-            $"[ARAnimalManager] Animal unregistered: " +
-            $"{animal.AnimalName}. " +
-            $"Total tracked: {activeTrackedAnimals.Count}"
-        );
-
+        Debug.Log($"[ARAnimalManager] Unregistered: {animal.AnimalName}. " +
+                  $"Total tracked: {activeTrackedAnimals.Count}");
 
         OnAnimalLost?.Invoke(animal);
 
-
-        // -----------------------------------------------------
-        // WAS THE SELECTED ANIMAL LOST?
-        // -----------------------------------------------------
-
         if (ReferenceEquals(selectedAnimal, animal))
         {
-            IAnimalAction nextAnimal = null;
-
+            IAnimalAction next = null;
 
             if (activeTrackedAnimals.Count > 0)
             {
-                nextAnimal =
-                    activeTrackedAnimals[
-                        activeTrackedAnimals.Count - 1
-                    ];
+                next = activeTrackedAnimals[activeTrackedAnimals.Count - 1];
             }
 
-
-            // If another animal is tracked, select it.
-            // Otherwise selection becomes null.
-            SelectAnimal(nextAnimal);
+            // null if nothing is tracked, so buttons can hide
+            SelectAnimal(next);
         }
     }
 
-
     // =========================================================
-    // SELECT ANIMAL
+    // SELECTION
     // =========================================================
 
     public void SelectAnimal(IAnimalAction animal)
     {
-        // -----------------------------------------------------
-        // If same animal is already selected, do nothing.
-        // -----------------------------------------------------
-
-        if (ReferenceEquals(selectedAnimal, animal))
-            return;
-
+        if (ReferenceEquals(selectedAnimal, animal)) return;
 
         selectedAnimal = animal;
-
-
-       
-
-
         OnSelectedAnimalChanged?.Invoke(selectedAnimal);
     }
-
-
-    // =========================================================
-    // CLEAR SELECTION
-    // =========================================================
 
     public void ClearSelectedAnimal()
     {
         SelectAnimal(null);
     }
 
-
     // =========================================================
-    // ACTION
+    // ACTIONS (buttons)
     // =========================================================
 
     public void TriggerAction()
     {
-        if (selectedAnimal == null)
-        {
-            Debug.LogWarning(
-                "[ARAnimalManager] No animal selected to perform action."
-            );
-
-            return;
-        }
-
+        if (!HasSelected("perform action")) return;
         selectedAnimal.PlayActionAnimation();
     }
 
-
-    // =========================================================
-    // AUDIO
-    // =========================================================
-
     public void TriggerAudio()
     {
-        if (selectedAnimal == null)
-        {
-            Debug.LogWarning(
-                "[ARAnimalManager] No animal selected to play audio."
-            );
-
-            return;
-        }
-
+        if (!HasSelected("play audio")) return;
         selectedAnimal.PlayAudioWithAnimation();
     }
 
-
-    // =========================================================
-    // MOVE
-    // =========================================================
-
     public void TriggerMove()
     {
-        if (selectedAnimal == null)
-        {
-            Debug.LogWarning(
-                "[ARAnimalManager] No animal selected to move."
-            );
-
-            return;
-        }
-
+        if (!HasSelected("move")) return;
         selectedAnimal.PlayMove();
     }
 
-
-    // =========================================================
-    // IDLE
-    // =========================================================
-
     public void TriggerIdle()
     {
-        if (selectedAnimal == null)
-        {
-            Debug.LogWarning(
-                "[ARAnimalManager] No animal selected for idle."
-            );
-
-            return;
-        }
-
+        if (!HasSelected("idle")) return;
         selectedAnimal.PlayIdle();
     }
-
-
-    // =========================================================
-    // ACTION ON ALL
-    // =========================================================
 
     public void TriggerActionOnAll()
     {
         foreach (IAnimalAction animal in activeTrackedAnimals)
         {
-            if (animal != null)
-            {
-                animal.PlayActionAnimation();
-            }
+            if (animal != null) animal.PlayActionAnimation();
         }
     }
-
-
-    // =========================================================
-    // AUDIO ON ALL
-    // =========================================================
 
     public void TriggerAudioOnAll()
     {
         foreach (IAnimalAction animal in activeTrackedAnimals)
         {
-            if (animal != null)
-            {
-                animal.PlayAudioWithAnimation();
-            }
+            if (animal != null) animal.PlayAudioWithAnimation();
         }
     }
 
+    private bool HasSelected(string what)
+    {
+        if (selectedAnimal != null && selectedAnimal.IsTracked) return true;
+
+        Debug.LogWarning($"[ARAnimalManager] No tracked animal selected to {what}.");
+        return false;
+    }
 }

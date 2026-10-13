@@ -21,13 +21,15 @@ public class PanelController : MonoBehaviour
     [SerializeField] private GameObject actionsButtonsPanel;
     [Tooltip("The animal info card panel.")]
     [SerializeField] private GameObject infoCardPanel;
-    [Tooltip("The Settings / Language selection panel.")]
+    [Tooltip("The Settings panel (the image box that holds the Language / Sound buttons).")]
     [SerializeField] private GameObject settingPanel;
 
     [Header("Interactive Buttons & Header")]
     [SerializeField] private Button okButton;
     [SerializeField] private Button closeInstructionButton;
-    [SerializeField] private GameObject settingButton;
+    [Tooltip("The main SETTING button (the one the user taps to open the Setting Panel). Needs a Button component. Must NOT be a child of the Setting Panel.")]
+    [SerializeField] private GameObject LanguagesettingButton;
+    [Tooltip("The Back button inside the Setting Panel. Auto-found (a Button named like 'back') if left empty.")]
     [SerializeField] private Button settingBackButton;
     [SerializeField] private GameObject logoObject;
     [Tooltip("The Info button. Must NOT be a child of the logo, setting button or actions panel.")]
@@ -35,6 +37,21 @@ public class PanelController : MonoBehaviour
 
     [Tooltip("The Back button of the info screen. Auto-found (a Button named like 'Info...Back') if left empty.")]
     [SerializeField] private Button infoBackButton;
+
+    [Header("Settings Menu (auto-found by name if left empty)")]
+    [Tooltip("Button inside the Setting Panel that opens the language list (e.g. 'Language_option').")]
+    [SerializeField] private Button languageOptionButton;
+    [Tooltip("The language list / sub panel (e.g. 'Language_sub_panel'). Shown INSTEAD of the Setting Panel.")]
+    [SerializeField] private GameObject languageSubPanel;
+    [Tooltip("Back button inside the language sub panel. Returns to the Setting Panel. Auto-found (a Button named like 'back') if left empty.")]
+    [SerializeField] private Button languageSubBackButton;
+
+    [Tooltip("Button inside the Setting Panel that opens the sound options (e.g. 'Sound_option').")]
+    [SerializeField] private Button soundOptionButton;
+    [Tooltip("The sound options sub panel (e.g. 'Sound_sub_panel'). Shown INSTEAD of the Setting Panel.")]
+    [SerializeField] private GameObject soundSubPanel;
+    [Tooltip("Back button inside the sound sub panel. Returns to the Setting Panel. Auto-found (a Button named like 'back') if left empty.")]
+    [SerializeField] private Button soundSubBackButton;
 
     [Header("Loading UI Elements")]
     [SerializeField] private Slider progressBar;
@@ -84,6 +101,7 @@ public class PanelController : MonoBehaviour
             gameObject.AddComponent<LanguageManager>();
 
         AutoResolveReferences();
+        DetachSubPanelsFromSettingPanel();
         CacheBackgroundRefs();
         SetupButtonListeners();
 
@@ -121,8 +139,8 @@ public class PanelController : MonoBehaviour
 
         if (instructionPanel != null) instructionPanel.SetActive(false);
         if (logoObject != null) logoObject.SetActive(false);
-        if (settingButton != null) settingButton.SetActive(false);
-        if (settingPanel != null) settingPanel.SetActive(false);
+        if (LanguagesettingButton != null) LanguagesettingButton.SetActive(false);
+        CloseSettingsCompletely();
         if (actionsButtonsPanel != null) actionsButtonsPanel.SetActive(false);
         if (infoCardPanel != null) infoCardPanel.SetActive(false);
         if (infoBackButton != null) infoBackButton.gameObject.SetActive(false);
@@ -229,7 +247,7 @@ public class PanelController : MonoBehaviour
         // Only do the expensive full-scene scan if something is actually missing
         bool needScan =
             cautionObject == null || loadingPanel == null || instructionPanel == null ||
-            settingButton == null || settingPanel == null || settingBackButton == null ||
+            LanguagesettingButton == null || settingPanel == null ||
             logoObject == null || backgroundObject == null || actionsButtonsPanel == null ||
             infoCardPanel == null || progressBar == null || progressText == null || okButton == null;
 
@@ -249,17 +267,11 @@ public class PanelController : MonoBehaviour
                 if (instructionPanel == null && (tName == "Instruction Panel" || tName == "Instruction_Panel"))
                     instructionPanel = t.gameObject;
 
-                if (settingButton == null && tName == "setting_button")
-                    settingButton = t.gameObject;
+                if (LanguagesettingButton == null && (tName == "setting_button" || tName == "Setting_button" || tName == "Setting_Button"))
+                    LanguagesettingButton = t.gameObject;
 
-                if (settingPanel == null && (tName == "Setting_panel" || tName == "Setting_Panel"))
+                if (settingPanel == null && (tName == "Setting_panel" || tName == "Setting_Panel" || tName == "Setting_Pannel"))
                     settingPanel = t.gameObject;
-
-                if (settingBackButton == null && (tName == "Back_button" || tName == "back_button"))
-                {
-                    if (settingPanel != null && t.IsChildOf(settingPanel.transform))
-                        settingBackButton = t.GetComponent<Button>();
-                }
 
                 if (logoObject == null && (tName == "Logo" || tName == "logo" || tName == "Aug"))
                     logoObject = t.gameObject;
@@ -344,6 +356,97 @@ public class PanelController : MonoBehaviour
                 }
             }
         }
+
+        AutoResolveSettingsMenu();
+    }
+
+    // Finds the settings items by name, so the Inspector fields can stay empty:
+    //   Language_option, Sound_option, Language_sub_panel, Sound_sub_panel, back buttons
+    private void AutoResolveSettingsMenu()
+    {
+        if (settingPanel == null) return;
+
+        // Pass 1: sub panels (inside Setting panel first, then anywhere in the scene)
+        Transform[] children = settingPanel.GetComponentsInChildren<Transform>(true);
+        foreach (Transform t in children)
+        {
+            if (t == settingPanel.transform) continue;
+            MatchSubPanel(t);
+        }
+
+        if (languageSubPanel == null || soundSubPanel == null)
+        {
+            foreach (Transform t in FindObjectsByType<Transform>(FindObjectsInactive.Include))
+                MatchSubPanel(t);
+        }
+
+        // Pass 2: buttons directly in the Setting panel (ignoring anything inside a sub panel)
+        foreach (Transform t in children)
+        {
+            if (t == settingPanel.transform) continue;
+            if (languageSubPanel != null && t.IsChildOf(languageSubPanel.transform)) continue;
+            if (soundSubPanel != null && t.IsChildOf(soundSubPanel.transform)) continue;
+
+            string n = t.name.Trim().ToLowerInvariant().Replace(" ", "_");
+            Button b = t.GetComponent<Button>();
+            if (b == null) continue;
+
+            if (languageOptionButton == null && n.Contains("language") && !n.Contains("sub"))
+                languageOptionButton = b;
+
+            if (soundOptionButton == null && n.Contains("sound") && !n.Contains("sub"))
+                soundOptionButton = b;
+
+            if (settingBackButton == null && n.Contains("back"))
+                settingBackButton = b;
+        }
+
+        // Pass 3: back buttons inside the sub panels
+        if (languageSubBackButton == null) languageSubBackButton = FindBackButtonIn(languageSubPanel);
+        if (soundSubBackButton == null)    soundSubBackButton    = FindBackButtonIn(soundSubPanel);
+    }
+
+    private void MatchSubPanel(Transform t)
+    {
+        string n = t.name.Trim().ToLowerInvariant().Replace(" ", "_");
+
+        if (languageSubPanel == null && n.Contains("language") && n.Contains("sub"))
+            languageSubPanel = t.gameObject;
+
+        if (soundSubPanel == null && n.Contains("sound") && n.Contains("sub"))
+            soundSubPanel = t.gameObject;
+    }
+
+    private Button FindBackButtonIn(GameObject panel)
+    {
+        if (panel == null) return null;
+
+        foreach (Button b in panel.GetComponentsInChildren<Button>(true))
+        {
+            if (b.name.ToLowerInvariant().Contains("back"))
+                return b;
+        }
+        return null;
+    }
+
+    // If a sub panel is a CHILD of the Setting panel, hiding the Setting panel would hide it too.
+    // So at startup it is moved next to the Setting panel (same parent), which lets the
+    // Setting panel be invisible while the sub panel is showing.
+    private void DetachSubPanelsFromSettingPanel()
+    {
+        if (settingPanel == null || settingPanel.transform.parent == null) return;
+
+        DetachFromSettingPanel(languageSubPanel);
+        DetachFromSettingPanel(soundSubPanel);
+    }
+
+    private void DetachFromSettingPanel(GameObject panel)
+    {
+        if (panel == null) return;
+        if (panel.transform == settingPanel.transform) return;
+
+        if (panel.transform.IsChildOf(settingPanel.transform))
+            panel.transform.SetParent(settingPanel.transform.parent, false);
     }
 
     private void CacheBackgroundRefs()
@@ -375,20 +478,56 @@ public class PanelController : MonoBehaviour
             closeInstructionButton.onClick.AddListener(OnInstructionPanelClose);
         }
 
-        if (settingButton != null)
+        // Main setting button
+        if (LanguagesettingButton != null)
         {
-            Button btn = settingButton.GetComponent<Button>();
+            Button btn = LanguagesettingButton.GetComponent<Button>();
             if (btn != null)
             {
                 btn.onClick.RemoveListener(OnSettingButtonClicked);
                 btn.onClick.AddListener(OnSettingButtonClicked);
             }
+            else
+            {
+                Debug.LogWarning("PanelController: the Setting button object has no Button component. " +
+                                 "Assign the object that actually has the Button.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("PanelController: 'Languagesetting Button' is not assigned and no object named 'setting_button' was found.");
         }
 
+        // Buttons inside the setting panel
         if (settingBackButton != null)
         {
             settingBackButton.onClick.RemoveListener(OnSettingBackClicked);
             settingBackButton.onClick.AddListener(OnSettingBackClicked);
+        }
+
+        if (languageOptionButton != null)
+        {
+            languageOptionButton.onClick.RemoveListener(OnLanguageOptionClicked);
+            languageOptionButton.onClick.AddListener(OnLanguageOptionClicked);
+        }
+
+        if (soundOptionButton != null)
+        {
+            soundOptionButton.onClick.RemoveListener(OnSoundOptionClicked);
+            soundOptionButton.onClick.AddListener(OnSoundOptionClicked);
+        }
+
+        // Back buttons inside the sub panels
+        if (languageSubBackButton != null)
+        {
+            languageSubBackButton.onClick.RemoveListener(OnSubPanelBackClicked);
+            languageSubBackButton.onClick.AddListener(OnSubPanelBackClicked);
+        }
+
+        if (soundSubBackButton != null)
+        {
+            soundSubBackButton.onClick.RemoveListener(OnSubPanelBackClicked);
+            soundSubBackButton.onClick.AddListener(OnSubPanelBackClicked);
         }
 
         if (Info_button != null)
@@ -416,15 +555,27 @@ public class PanelController : MonoBehaviour
         if (closeInstructionButton != null)
             closeInstructionButton.onClick.RemoveListener(OnInstructionPanelClose);
 
-        if (settingButton != null)
+        if (LanguagesettingButton != null)
         {
-            Button btn = settingButton.GetComponent<Button>();
+            Button btn = LanguagesettingButton.GetComponent<Button>();
             if (btn != null)
                 btn.onClick.RemoveListener(OnSettingButtonClicked);
         }
 
         if (settingBackButton != null)
             settingBackButton.onClick.RemoveListener(OnSettingBackClicked);
+
+        if (languageOptionButton != null)
+            languageOptionButton.onClick.RemoveListener(OnLanguageOptionClicked);
+
+        if (soundOptionButton != null)
+            soundOptionButton.onClick.RemoveListener(OnSoundOptionClicked);
+
+        if (languageSubBackButton != null)
+            languageSubBackButton.onClick.RemoveListener(OnSubPanelBackClicked);
+
+        if (soundSubBackButton != null)
+            soundSubBackButton.onClick.RemoveListener(OnSubPanelBackClicked);
 
         if (Info_button != null)
         {
@@ -437,20 +588,118 @@ public class PanelController : MonoBehaviour
             infoBackButton.onClick.RemoveListener(OnInfoBackButtonClicked);
     }
 
-    public void OnSettingButtonClicked()
+    // =========================================================
+    // SETTINGS MENU
+    //
+    //   setting_button      -> opens Setting_panel (closes everything if already open)
+    //   Language_option     -> Setting_panel becomes INVISIBLE, Language_sub_panel shows
+    //   Sound_option        -> Setting_panel becomes INVISIBLE, Sound_sub_panel shows
+    //   sub panel Back      -> sub panel closes, Setting_panel shows again
+    //   Setting_panel Back  -> closes everything
+    // =========================================================
+
+    private bool IsSettingsOpen()
     {
-        if (LanguageManager.Instance != null)
-            LanguageManager.Instance.ToggleSettingPanel();
-        else if (settingPanel != null)
-            settingPanel.SetActive(!settingPanel.activeSelf);
+        return (settingPanel != null && settingPanel.activeSelf)
+            || (languageSubPanel != null && languageSubPanel.activeSelf)
+            || (soundSubPanel != null && soundSubPanel.activeSelf);
     }
 
+    /// <summary>
+    /// Setting button pressed: opens the Setting panel, or closes the whole settings menu if it is open.
+    /// </summary>
+    public void OnSettingButtonClicked()
+    {
+        Debug.Log("PanelController: Setting button clicked");
+
+        if (infoModeActive) { Debug.Log("Blocked: infoModeActive"); return; }
+
+        if (settingPanel == null)
+        {
+            Debug.LogWarning("PanelController: Setting Panel is not assigned!");
+            return;
+        }
+
+        if (IsSettingsOpen())
+        {
+            CloseSettingsCompletely();
+        }
+        else
+        {
+            ShowSettingPanel();
+        }
+    }
+
+    /// <summary>
+    /// Back button inside the Setting panel: closes the whole settings menu.
+    /// </summary>
     public void OnSettingBackClicked()
     {
-        if (LanguageManager.Instance != null)
-            LanguageManager.Instance.CloseSettingPanel();
-        else if (settingPanel != null)
+        CloseSettingsCompletely();
+    }
+
+    /// <summary>
+    /// Back button inside a sub panel: goes back to the Setting panel.
+    /// </summary>
+    public void OnSubPanelBackClicked()
+    {
+        ShowSettingPanel();
+    }
+
+    public void OnLanguageOptionClicked() { OpenSubPanel(languageSubPanel); }
+    public void OnSoundOptionClicked()    { OpenSubPanel(soundSubPanel); }
+
+    // Shows the main Setting panel (and hides the sub panels).
+    private void ShowSettingPanel()
+    {
+        CloseSubPanels();
+
+        if (settingPanel != null)
+        {
+            settingPanel.SetActive(true);
+            settingPanel.transform.SetAsLastSibling(); // draw on top
+        }
+    }
+
+    // Hides the Setting panel and shows only the chosen sub panel.
+    private void OpenSubPanel(GameObject panel)
+    {
+        if (panel == null)
+        {
+            Debug.LogWarning("PanelController: that sub panel is not assigned and was not found by name " +
+                             "(expected names like 'Language_sub_panel' / 'Sound_sub_panel').");
+            return;
+        }
+
+        CloseSubPanels();
+
+        if (settingPanel != null)
+            settingPanel.SetActive(false);   // <- Setting panel becomes invisible
+
+        panel.SetActive(true);
+        panel.transform.SetAsLastSibling();  // draw on top
+
+        Debug.Log($"PanelController: opened '{panel.name}', parent='{(panel.transform.parent != null ? panel.transform.parent.name : "none")}', " +
+                  $"activeInHierarchy={panel.activeInHierarchy}", panel);
+    }
+
+    private void CloseSubPanels()
+    {
+        if (languageSubPanel != null) languageSubPanel.SetActive(false);
+        if (soundSubPanel != null)    soundSubPanel.SetActive(false);
+    }
+
+    private void CloseSettingsCompletely()
+    {
+        CloseSubPanels();
+        if (settingPanel != null)
             settingPanel.SetActive(false);
+    }
+
+    // Kept so any old Inspector OnClick that still points to the old name keeps working.
+    public void OnLangaugeSettingButtonClicked()
+    {
+        OnSettingButtonClicked();
     }
 
     // =========================================================
@@ -483,7 +732,7 @@ public class PanelController : MonoBehaviour
 
         // Logo + setting button
         if (logoObject != null) logoObject.SetActive(normalMode);
-        if (settingButton != null) settingButton.SetActive(normalMode);
+        if (LanguagesettingButton != null) LanguagesettingButton.SetActive(normalMode);
 
         // Info button is visible in both modes
         if (Info_button != null) Info_button.SetActive(true);
@@ -495,8 +744,8 @@ public class PanelController : MonoBehaviour
 
         if (enable)
         {
-            // Close the language panel and the action buttons while in info mode
-            OnSettingBackClicked();
+            // Close the whole settings menu and the action buttons while in info mode
+            CloseSettingsCompletely();
             SetActionsVisible(false);
         }
         else
@@ -556,7 +805,7 @@ public class PanelController : MonoBehaviour
 
         if (instructionPanel != null) instructionPanel.SetActive(true);
         if (logoObject != null) logoObject.SetActive(true);
-        if (settingButton != null) settingButton.SetActive(true);
+        if (LanguagesettingButton != null) LanguagesettingButton.SetActive(true);
 
         loadingRoutine = null;
     }
@@ -618,7 +867,7 @@ public class PanelController : MonoBehaviour
 
         if (instructionPanel != null) instructionPanel.SetActive(false);
         if (logoObject != null) logoObject.SetActive(true);
-        if (settingButton != null) settingButton.SetActive(true);
+        if (LanguagesettingButton != null) LanguagesettingButton.SetActive(true);
         if (Info_button != null) Info_button.SetActive(true);
 
         if (arUIManager != null)

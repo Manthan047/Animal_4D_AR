@@ -33,11 +33,9 @@ public class LanguageManager : MonoBehaviour
     [SerializeField] private Button hindiButton;
     [SerializeField] private Button submitButton;
 
-    [Header("Flag Display")]
-    [SerializeField] private Image flagImage;      // the Image in the logo box
-    [SerializeField] private Sprite englishFlag;   // e.g. UK / US flag
-    [SerializeField] private Sprite spanishFlag;   // Spain flag
-    [SerializeField] private Sprite hindiFlag;     // India flag
+    [Header("Selected Button Border")]
+    [SerializeField] private Color selectedBorderColor = new Color(0.2f, 0.8f, 0.4f, 1f);
+    [SerializeField] private Vector2 selectedBorderSize = new Vector2(4f, -4f);
 
     // Localized strings dictionary: [Key] -> { [Language] -> Value }
     private static readonly Dictionary<string, Dictionary<string, string>> StringTable = new Dictionary<string, Dictionary<string, string>>
@@ -73,13 +71,13 @@ public class LanguageManager : MonoBehaviour
         },
         ["instruction_step1"] = new Dictionary<string, string>
         {
-            [LANG_ENGLISH] = "1. Place the card facing the camera,and it will automatically scan the image.",
+            [LANG_ENGLISH] = "1. Place the card facing the camera, and it will automatically scan the image.",
             [LANG_SPANISH] = "1. Apunta la cámara directamente a una tarjeta Animal 4D+ para darle vida al animal.",
             [LANG_HINDI] = "1. जानवर को 4D AR में देखने के लिए अपने कैमरे को एनिमल 4D+ कार्ड की ओर रखें।"
         },
         ["instruction_step2"] = new Dictionary<string, string>
         {
-            [LANG_ENGLISH] = "2. If you dont have  Animal  4D+ card set.you can have it here.",
+            [LANG_ENGLISH] = "2. If you don't have the Animal 4D+ card set, you can get it here.",
             [LANG_SPANISH] = "2. ¿No tienes tarjetas físicas? Toca 'Obtener Tarjetas' para descargarlas e imprimirlas.",
             [LANG_HINDI] = "2. क्या आपके पास कार्ड नहीं हैं? कार्ड डाउनलोड और प्रिंट करने के लिए 'कार्ड प्राप्त करें' दबाएं।"
         },
@@ -127,15 +125,15 @@ public class LanguageManager : MonoBehaviour
             [LANG_SPANISH] = "Enviar",
             [LANG_HINDI] = "सबमिट करें"
         },
-         ["Guide_Text"] = new Dictionary<string, string>
+        ["Guide_Text"] = new Dictionary<string, string>
         {
-            [LANG_ENGLISH] = "You can always change the langauge by accesseing Tools > Set Langauge",
+            [LANG_ENGLISH] = "You can always change the language by accessing Tools > Set Language",
             [LANG_SPANISH] = "Siempre puedes cambiar el idioma accediendo a Herramientas > Establecer idioma",
             [LANG_HINDI] = "आप टूल्स > सेट लैंग्वेज पर जाकर भाषा बदल सकते हैं।"
         },
         ["change_langauge"] = new Dictionary<string, string>
         {
-            [LANG_ENGLISH] = "Change Langauge",
+            [LANG_ENGLISH] = "Change Language",
             [LANG_SPANISH] = "Cambiar idioma",
             [LANG_HINDI] = "भाषा बदलें"
         },
@@ -185,15 +183,15 @@ public class LanguageManager : MonoBehaviour
         },
         ["mode_3d"] = new Dictionary<string, string>
         {
-            [LANG_ENGLISH] = "3D Mode",
-            [LANG_SPANISH] = "Modo 3D",
-            [LANG_HINDI] = "3D मोड"
+            [LANG_ENGLISH] = "3D",
+            [LANG_SPANISH] = "3D",
+            [LANG_HINDI] = "3D"
         },
         ["mode_2d"] = new Dictionary<string, string>
         {
-            [LANG_ENGLISH] = "2D Mode",
-            [LANG_SPANISH] = "Modo 2D",
-            [LANG_HINDI] = "2D मोड"
+            [LANG_ENGLISH] = "2D",
+            [LANG_SPANISH] = "2D",
+            [LANG_HINDI] = "2D"
         },
         ["guidance_scan"] = new Dictionary<string, string>
         {
@@ -415,14 +413,14 @@ public class LanguageManager : MonoBehaviour
         PlayerPrefs.SetString(PREF_KEY_LANGUAGE, currentLanguage);
         PlayerPrefs.Save();
 
-        Debug.Log($"[LanguageManager] Language switched to: {currentLanguage}\nCalled from:\n{System.Environment.StackTrace}");
+        Debug.Log($"[LanguageManager] Language switched to: {currentLanguage}");
 
         UpdateLanguageButtonVisuals();
         NotifyLanguageChanged();
     }
 
     /// <summary>
-    /// Step 1: tapping a language box only SELECTS it (no language change yet).
+    /// Step 1: tapping a language button only SELECTS it (no language change yet).
     /// </summary>
     private void SelectPendingLanguage(string language)
     {
@@ -490,7 +488,8 @@ public class LanguageManager : MonoBehaviour
         string normalized = rawAnimalName.Trim();
 
         // Handle variations (e.g. Rex vs Tyrannosaurus Rex)
-        if (normalized.IndexOf("rex", StringComparison.OrdinalIgnoreCase) >= 0 || normalized.IndexOf("tyranno", StringComparison.OrdinalIgnoreCase) >= 0)
+        if (normalized.IndexOf("rex", StringComparison.OrdinalIgnoreCase) >= 0 ||
+            normalized.IndexOf("tyranno", StringComparison.OrdinalIgnoreCase) >= 0)
             normalized = "Tyrannosaurus Rex";
         else if (normalized.IndexOf("stego", StringComparison.OrdinalIgnoreCase) >= 0)
             normalized = "Stegosaurus";
@@ -515,9 +514,8 @@ public class LanguageManager : MonoBehaviour
     public string GetLocalizedAnimalName(string rawAnimalName)
     {
         if (TryGetLocalizedAnimalInfo(rawAnimalName, out var info))
-        {
             return info.Name;
-        }
+
         return rawAnimalName;
     }
 
@@ -541,14 +539,10 @@ public class LanguageManager : MonoBehaviour
         var sb = new System.Text.StringBuilder();
 
         if (!string.IsNullOrEmpty(classification))
-        {
             sb.AppendLine($"• <b>{GetText("lbl_classification", "Classification")}:</b> {classification}");
-        }
 
         if (!string.IsNullOrEmpty(era))
-        {
             sb.AppendLine($"• <b>{GetText("lbl_era", "Era")}:</b> {era}");
-        }
 
         if (!string.IsNullOrEmpty(length) || !string.IsNullOrEmpty(weight))
         {
@@ -559,26 +553,18 @@ public class LanguageManager : MonoBehaviour
         }
 
         if (sb.Length > 0)
-        {
             sb.AppendLine();
-        }
 
         if (!string.IsNullOrEmpty(description))
-        {
             sb.AppendLine(description);
-        }
 
         if (!string.IsNullOrEmpty(funFact))
         {
             sb.AppendLine();
             if (!funFact.StartsWith("💡") && !funFact.StartsWith("Fun Fact", StringComparison.OrdinalIgnoreCase))
-            {
                 sb.AppendLine($"<b>{funFactPrefix}</b>{funFact}");
-            }
             else
-            {
                 sb.AppendLine($"<b>{funFact}</b>");
-            }
         }
 
         return sb.ToString().TrimEnd();
@@ -603,33 +589,29 @@ public class LanguageManager : MonoBehaviour
 
     public void OpenSettingPanel()
     {
-        if (settingPanel != null)
-        {
-            settingPanel.SetActive(true);
-            pendingLanguage = currentLanguage; // discard any old unsubmitted choice
-            UpdateLanguageButtonVisuals();
-        }
+        if (settingPanel == null) return;
+
+        settingPanel.SetActive(true);
+        pendingLanguage = currentLanguage; // discard any old unsubmitted choice
+        UpdateLanguageButtonVisuals();
     }
 
     public void CloseSettingPanel()
     {
-        if (settingPanel != null)
-        {
-            settingPanel.SetActive(false);
-            pendingLanguage = currentLanguage; // discard unsubmitted choice
-            UpdateLanguageButtonVisuals();
-        }
+        if (settingPanel == null) return;
+
+        settingPanel.SetActive(false);
+        pendingLanguage = currentLanguage; // discard unsubmitted choice
+        UpdateLanguageButtonVisuals();
     }
 
     public void ToggleSettingPanel()
     {
-        if (settingPanel != null)
-        {
-            bool isOpening = !settingPanel.activeSelf;
-            settingPanel.SetActive(isOpening);
-            pendingLanguage = currentLanguage; // always start/end from the active language
-            UpdateLanguageButtonVisuals();
-        }
+        if (settingPanel == null) return;
+
+        settingPanel.SetActive(!settingPanel.activeSelf);
+        pendingLanguage = currentLanguage; // always start/end from the active language
+        UpdateLanguageButtonVisuals();
     }
 
     // =========================================================
@@ -668,45 +650,32 @@ public class LanguageManager : MonoBehaviour
             // PanelController builds that string itself ("Loading... 45%").
             if (tName == "Caution_text")
                 AttachLocalizedText(t.gameObject, "lbl_parental_supervision");
-            else if(tName=="infotext")
-                AttachLocalizedText(t.gameObject,"Guide_Text");
-
-            else if(tName=="Langauge_Title")
-                AttachLocalizedText(t.gameObject,"change_langauge");
-    
+            else if (tName == "infotext")
+                AttachLocalizedText(t.gameObject, "Guide_Text");
+            else if (tName == "Change_Language")
+                AttachLocalizedText(t.gameObject, "change_langauge");
             else if (tName == "ok_button")
                 AttachLocalizedTextToChild(t.gameObject, "btn_ok");
-
             else if (tName == "Titletext" && t.parent != null && t.parent.name.Contains("Instruction"))
                 AttachLocalizedText(t.gameObject, "title_instructions");
-
             else if (tName == "Instruction_text01")
                 AttachLocalizedText(t.gameObject, "instruction_step1");
-
             else if (tName == "Instruction_text02")
                 AttachLocalizedText(t.gameObject, "instruction_step2");
-
             else if (tName == "Get_the_card_button")
                 AttachLocalizedTextToChild(t.gameObject, "btn_get_card");
-
             else if (tName == "Language_text")
                 AttachLocalizedText(t.gameObject, "lbl_language");
-
             else if (tName == "Action Button")
                 AttachLocalizedTextToChild(t.gameObject, "btn_action");
-
             else if (tName == "Audio Button")
                 AttachLocalizedTextToChild(t.gameObject, "btn_audio");
-
             else if (tName == "Fast_Audio_button")
                 AttachLocalizedTextToChild(t.gameObject, "btn_fast_audio");
-
             else if (tName == "Share_button")
                 AttachLocalizedTextToChild(t.gameObject, "btn_share");
-
             else if (tName == "3d_text")
                 AttachLocalizedText(t.gameObject, "mode_3d");
-
             else if (tName == "2d_text")
                 AttachLocalizedText(t.gameObject, "mode_2d");
         }
@@ -769,8 +738,8 @@ public class LanguageManager : MonoBehaviour
             backButton.onClick.AddListener(CloseSettingPanel);
         }
 
-        // Language buttons only SELECT a language
-        // "new ButtonClickedEvent()" clears Inspector listeners too (RemoveAllListeners does not)
+        // Language buttons only SELECT a language.
+        // "new ButtonClickedEvent()" clears Inspector listeners too (RemoveAllListeners does not).
         if (englishButton != null)
         {
             englishButton.onClick = new Button.ButtonClickedEvent();
@@ -796,40 +765,44 @@ public class LanguageManager : MonoBehaviour
             submitButton.onClick.AddListener(ConfirmLanguage);
         }
     }
-  
+
+    // =========================================================
+    // BUTTON VISUALS (simple buttons, border on selected only)
+    // =========================================================
+
     private void UpdateLanguageButtonVisuals()
     {
-    SetButtonHighlight(englishButton, pendingLanguage == LANG_ENGLISH);
-    SetButtonHighlight(spanishButton, pendingLanguage == LANG_SPANISH);
-    SetButtonHighlight(hindiButton, pendingLanguage == LANG_HINDI);
+        SetButtonHighlight(englishButton, pendingLanguage == LANG_ENGLISH);
+        SetButtonHighlight(spanishButton, pendingLanguage == LANG_SPANISH);
+        SetButtonHighlight(hindiButton,   pendingLanguage == LANG_HINDI);
 
-    UpdateFlag(); // <-- add this
-
-    if (submitButton != null)
-        submitButton.interactable = (pendingLanguage != currentLanguage);
+        if (submitButton != null)
+            submitButton.interactable = (pendingLanguage != currentLanguage);
     }
 
+    /// <summary>
+    /// Shows a border on the selected button only.
+    /// Does NOT touch Image.color, so the color set in the Inspector is preserved.
+    /// </summary>
     private void SetButtonHighlight(Button btn, bool isSelected)
-{
-    if (btn == null) return;
-
-    // Keep the button background normal (no green fill)
-    Image img = btn.GetComponent<Image>();
-    if (img != null)
-        img.color = Color.white;
-
-    // Border only on the selected button
-    Outline outline = btn.GetComponent<Outline>();
-    if (outline == null)
     {
-        outline = btn.gameObject.AddComponent<Outline>();
-        outline.effectColor = new Color(0.2f, 0.8f, 0.4f, 1f); // border color
-        outline.effectDistance = new Vector2(4f, -4f);         // border thickness
-        outline.useGraphicAlpha = false;
+        if (btn == null) return;
+
+        Outline outline = btn.GetComponent<Outline>();
+        if (outline == null)
+        {
+            outline = btn.gameObject.AddComponent<Outline>();
+            outline.useGraphicAlpha = false;
+        }
+
+        outline.effectColor = selectedBorderColor;
+        outline.effectDistance = selectedBorderSize;
+        outline.enabled = isSelected;
     }
 
-    outline.enabled = isSelected;
-}
+    // =========================================================
+    // LOCALIZED TEXT HELPERS
+    // =========================================================
 
     private void AttachLocalizedText(GameObject go, string key)
     {
@@ -843,9 +816,7 @@ public class LanguageManager : MonoBehaviour
             LocalizedText lt = go.GetComponent<LocalizedText>();
             if (lt == null) lt = go.AddComponent<LocalizedText>();
             if (lt != null)
-            {
                 lt.LocalizationKey = key;
-            }
         }
         catch (Exception ex)
         {
@@ -859,26 +830,6 @@ public class LanguageManager : MonoBehaviour
 
         UniText unitext = go.GetComponentInChildren<UniText>(true);
         if (unitext != null)
-        {
             AttachLocalizedText(unitext.gameObject, key);
-        }
     }
-
-    private void UpdateFlag()
-   {
-    if (flagImage == null) return;
-
-    Sprite flag = null;
-    switch (currentLanguage)
-    {
-        case LANG_ENGLISH: flag = englishFlag; break;
-        case LANG_SPANISH: flag = spanishFlag; break;
-        case LANG_HINDI:   flag = hindiFlag;   break;
-    }
-
-    if (flag != null)
-        flagImage.sprite = flag;
-    }
-
-   
 }

@@ -28,6 +28,14 @@ public class ARUIManager : MonoBehaviour
     [Tooltip("AudioSource used to play the description narration clip. Auto-added if left empty.")]
     [SerializeField] private AudioSource descriptionAudioSource;
 
+    [Header("Audio Toggle Icons")]
+    [Tooltip("The Image that shows the speaker icon. If empty, the Toggle's Target Graphic is used.")]
+    [SerializeField] private Image audioIconImage;
+    [Tooltip("Shown by default (volume off). If left empty, the icon's current sprite is used as the muted sprite.")]
+    [SerializeField] private Sprite mutedSprite;
+    [Tooltip("Shown while the narration is playing (volume on).")]
+    [SerializeField] private Sprite unmutedSprite;
+
     private bool isPlayingDescriptionAudio = false;
 
     [Header("Side Panel Footer Icons")]
@@ -85,9 +93,10 @@ public class ARUIManager : MonoBehaviour
             {
                 descriptionAudioSource = gameObject.AddComponent<AudioSource>();
             }
-            descriptionAudioSource.playOnAwake = false;
-            descriptionAudioSource.loop = false;
         }
+
+        descriptionAudioSource.playOnAwake = false;
+        descriptionAudioSource.loop = false;
     }
 
     private void AutoResolveReferences()
@@ -223,7 +232,24 @@ public class ARUIManager : MonoBehaviour
             Debug.LogWarning("[ARUIManager] Share button not found. Drag it into the 'Share Button' field in the Inspector.", this);
         }
 
-        if (audioToggle != null) audioToggle.onValueChanged.AddListener(OnAudioToggleChanged);
+        if (audioToggle != null)
+        {
+            audioToggle.onValueChanged.AddListener(OnAudioToggleChanged);
+
+            // Fall back to the toggle's own graphic if no icon Image was assigned.
+            if (audioIconImage == null) audioIconImage = audioToggle.targetGraphic as Image;
+        }
+
+        // If no muted sprite was assigned, use whatever the icon currently shows as the muted icon.
+        if (mutedSprite == null && audioIconImage != null) mutedSprite = audioIconImage.sprite;
+
+        if (audioIconImage != null && (mutedSprite == null || unmutedSprite == null))
+        {
+            Debug.LogWarning("[ARUIManager] Muted/Unmuted sprites are not both assigned. The speaker icon will not swap correctly.", this);
+        }
+
+        // Default state: volume off, muted icon shown.
+        SetAudioToggleState(false);
 
         if (flatImageDisplay != null) flatImageDisplay.gameObject.SetActive(false);
 
@@ -260,6 +286,10 @@ public class ARUIManager : MonoBehaviour
 
     private void HandleLanguageChanged(string newLang)
     {
+        // The narration clip can differ per language, so stop whatever is playing
+        // and return to the muted state.
+        StopDescriptionAudio();
+
         ResolveCurrentAnimalData();
 
         if (currentAnimalData != null && animalCatalogManager != null)
@@ -386,7 +416,17 @@ public class ARUIManager : MonoBehaviour
 
     public void ShowInfoCard()
     {
+        bool wasAlreadyOpen = infoCardPanel != null && infoCardPanel.activeSelf;
+
         if (infoCardPanel != null) infoCardPanel.SetActive(true);
+
+        // FIX: every time the info card is freshly opened, audio must be stopped
+        // and the toggle/icon must be in the MUTED state. (Only when it was not
+        // already open, so a repeated call doesn't cut off narration that is playing.)
+        if (!wasAlreadyOpen)
+        {
+            StopDescriptionAudio();
+        }
 
         ResolveCurrentAnimalData();
 
@@ -502,10 +542,15 @@ public class ARUIManager : MonoBehaviour
 
     // =========================================================
     // DESCRIPTION NARRATION AUDIO TOGGLE LOGIC
+    // Default = muted icon. Tap -> narration plays + unmuted icon.
+    // Tap again / audio ends / animal, language or panel changes -> muted icon.
+    // Opening the info card always starts in the muted state.
     // =========================================================
 
     private void OnAudioToggleChanged(bool isOn)
     {
+        UpdateAudioIcon(isOn);
+
         if (isOn)
         {
             PlayDescriptionAudio();
@@ -521,11 +566,15 @@ public class ARUIManager : MonoBehaviour
         if (currentAnimalData == null || currentAnimalData.descriptionAudioClip == null)
         {
             Debug.LogWarning("[ARUIManager] No description audio clip assigned for the current animal.");
-            if (audioToggle != null) audioToggle.SetIsOnWithoutNotify(false);
+            SetAudioToggleState(false);
             return;
         }
 
-        if (descriptionAudioSource == null) return;
+        if (descriptionAudioSource == null)
+        {
+            SetAudioToggleState(false);
+            return;
+        }
 
         descriptionAudioSource.clip = currentAnimalData.descriptionAudioClip;
         descriptionAudioSource.Play();
@@ -540,11 +589,23 @@ public class ARUIManager : MonoBehaviour
         }
 
         isPlayingDescriptionAudio = false;
+        SetAudioToggleState(false);
+    }
 
-        if (audioToggle != null)
-        {
-            audioToggle.SetIsOnWithoutNotify(false);
-        }
+    // Sets the toggle state without firing the event, and keeps the icon in sync.
+    private void SetAudioToggleState(bool isOn)
+    {
+        if (audioToggle != null) audioToggle.SetIsOnWithoutNotify(isOn);
+        UpdateAudioIcon(isOn);
+    }
+
+    // Swaps the speaker icon: unmuted sprite when on, muted sprite when off.
+    private void UpdateAudioIcon(bool isOn)
+    {
+        if (audioIconImage == null) return;
+
+        Sprite target = isOn ? unmutedSprite : mutedSprite;
+        if (target != null) audioIconImage.sprite = target;
     }
 
     private void UpdateAudioToggleInteractable()
@@ -557,13 +618,11 @@ public class ARUIManager : MonoBehaviour
 
     private void Update()
     {
+        // When the narration finishes by itself, return to the muted icon.
         if (isPlayingDescriptionAudio && descriptionAudioSource != null && !descriptionAudioSource.isPlaying)
         {
             isPlayingDescriptionAudio = false;
-            if (audioToggle != null)
-            {
-                audioToggle.SetIsOnWithoutNotify(false);
-            }
+            SetAudioToggleState(false);
         }
     }
 

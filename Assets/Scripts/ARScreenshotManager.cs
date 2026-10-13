@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -5,92 +6,239 @@ using UnityEngine.UI;
 
 public class ARScreenshotManager : MonoBehaviour
 {
+    public enum LogoPosition
+    {
+        TopMiddle,
+        BottomMiddle,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight
+    }
+
     [Header("UI References")]
-    [Tooltip("Drag your main UI Canvas or Panel here to hide buttons while taking the shot.")]
+    [Tooltip("CanvasGroup to hide while taking the photo.")]
     [SerializeField] private CanvasGroup uiCanvasGroup;
 
-    [Tooltip("Optional flash panel to give visual feedback when taking a photo.")]
-    [SerializeField] private Image flashOverlay;
-    
-    [Header("Settings")]
-    [SerializeField] private float flashDuration = 0.15f;
-    
+    [Header("Logo (saved photo only)")]
+    [Tooltip("Assign the UI Image containing your logo.")]
+    [SerializeField] private Image logoImage;
+
+    [SerializeField] private LogoPosition logoPosition =
+        LogoPosition.TopMiddle;
+
+    [Range(0.05f, 0.5f)]
+    [SerializeField] private float logoWidthPercent = 0.2f;
+
+    [Range(0f, 0.1f)]
+    [SerializeField] private float logoMarginPercent = 0.03f;
+
+    private bool isCapturing;
 
     public void CaptureModelPhoto()
     {
+        if (isCapturing) return;
+
         StartCoroutine(CaptureScreenshotRoutine());
     }
 
     private IEnumerator CaptureScreenshotRoutine()
     {
-        // 1. Hide the UI so buttons don't appear in the captured photo
-        if (uiCanvasGroup != null)
+        isCapturing = true;
+
+        Texture2D screenshot = null;
+
+        try
         {
-            uiCanvasGroup.alpha = 0f;
-            uiCanvasGroup.interactable = false;
-            uiCanvasGroup.blocksRaycasts = false;
-        }
+            // Hide the main UI before capturing.
+            SetUIVisible(false);
 
-        // Wait for the end of the frame to ensure rendering is complete
-        yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
 
-        // 2. Capture the screen texture
-        Texture2D screenshot = ScreenCapture.CaptureScreenshotAsTexture();
+            screenshot = ScreenCapture.CaptureScreenshotAsTexture();
 
-        // 3. Re-enable UI
-        if (uiCanvasGroup != null)
-        {
-            uiCanvasGroup.alpha = 1f;
-            uiCanvasGroup.interactable = true;
-            uiCanvasGroup.blocksRaycasts = true;
-        }
+            // Restore UI immediately after capture.
+            SetUIVisible(true);
 
-        // 4. Trigger visual flash effect
-        if (flashOverlay != null)
-        {
-            StartCoroutine(TriggerFlashEffect());
-        }
+            if (screenshot == null)
+            {
+                Debug.LogError(
+                    "[ARScreenshotManager] Screenshot capture failed.");
+                yield break;
+            }
 
-        // 5. Encode texture to PNG
-        byte[] bytes = screenshot.EncodeToPNG();
-        Destroy(screenshot); // Clean up memory
+            // Add logo to the saved image only.
+            ApplyLogo(screenshot);
 
-        // 6. Save to device storage
-        string fileName = $"AR_Photo_{System.DateTime.Now:yyyyMMdd_HHmmss}.png";
+            byte[] bytes = screenshot.EncodeToPNG();
+
+            string fileName =
+                $"AR_Photo_{System.DateTime.Now:yyyyMMdd_HHmmss}.png";
 
 #if UNITY_EDITOR
-        string path = Path.Combine(Application.dataPath, fileName);
-        File.WriteAllBytes(path, bytes);
-        Debug.Log($"[ARScreenshotManager] Screenshot saved in Editor: {path}");
+            string path = Path.Combine(
+                Application.dataPath, fileName);
+
+            File.WriteAllBytes(path, bytes);
+
+            Debug.Log(
+                $"[ARScreenshotManager] Saved: {path}");
+
 #elif UNITY_ANDROID || UNITY_IOS
-        // Native Gallery plugin call (if installed):
-        NativeGallery.SaveImageToGallery(bytes, "Animal4D", fileName);
-        
-        // Default fallback path for persistent data
-        string path = Path.Combine(Application.persistentDataPath, fileName);
-        File.WriteAllBytes(path, bytes);
-        Debug.Log($"[ARScreenshotManager] Screenshot saved to persistent path: {path}");
+            NativeGallery.SaveImageToGallery(
+                bytes, "Animal4D", fileName);
+#else
+            string path = Path.Combine(
+                Application.persistentDataPath, fileName);
+
+            File.WriteAllBytes(path, bytes);
+
+            Debug.Log(
+                $"[ARScreenshotManager] Saved: {path}");
 #endif
+        }
+        finally
+        {
+            // Ensure UI is restored and the capture state is reset.
+            SetUIVisible(true);
+
+            if (screenshot != null)
+                Destroy(screenshot);
+
+            isCapturing = false;
+        }
     }
 
-    private IEnumerator TriggerFlashEffect()
+    private void SetUIVisible(bool visible)
     {
-        if (flashOverlay == null) yield break;
+        if (uiCanvasGroup == null) return;
 
-        flashOverlay.gameObject.SetActive(true);
-        Color flashColor = flashOverlay.color;
-        flashColor.a = 1f;
-        flashOverlay.color = flashColor;
+        uiCanvasGroup.alpha = visible ? 1f : 0f;
+        uiCanvasGroup.interactable = visible;
+        uiCanvasGroup.blocksRaycasts = visible;
+    }
 
-        float elapsed = 0f;
-        while (elapsed < flashDuration)
+    private void ApplyLogo(Texture2D target)
+    {
+        if (logoImage == null || logoImage.sprite == null)
         {
-            elapsed += Time.deltaTime;
-            flashColor.a = Mathf.Lerp(1f, 0f, elapsed / flashDuration);
-            flashOverlay.color = flashColor;
-            yield return null;
+            Debug.LogError(
+                "[ARScreenshotManager] Assign Logo Image and its Source Image.");
+            return;
         }
 
-        flashOverlay.gameObject.SetActive(false);
+        Sprite sprite = logoImage.sprite;
+        Texture2D source = sprite.texture;
+
+        if (!source.isReadable)
+        {
+            Debug.LogError(
+                "[ARScreenshotManager] Enable Read/Write on the logo texture.");
+            return;
+        }
+
+        // Extract the actual sprite area, including sliced/atlas sprites.
+        Rect rect = sprite.textureRect;
+
+        int sourceX = Mathf.RoundToInt(rect.x);
+        int sourceY = Mathf.RoundToInt(rect.y);
+        int sourceW = Mathf.RoundToInt(rect.width);
+        int sourceH = Mathf.RoundToInt(rect.height);
+
+        if (sourceW <= 0 || sourceH <= 0)
+        {
+            Debug.LogError("Logo sprite has invalid dimensions.");
+            return;
+        }
+
+        int logoW = Mathf.Max(
+            1, Mathf.RoundToInt(target.width * logoWidthPercent));
+
+        int logoH = Mathf.Max(
+            1, Mathf.RoundToInt(
+                logoW * (float)sourceH / sourceW));
+
+        // Keep logo height within the screenshot.
+        if (logoH > target.height)
+        {
+            float scale = (float)target.height / logoH;
+            logoH = target.height;
+            logoW = Mathf.Max(1, Mathf.RoundToInt(logoW * scale));
+        }
+
+        int margin = Mathf.RoundToInt(
+            target.width * logoMarginPercent);
+
+        int startX;
+        switch (logoPosition)
+        {
+            case LogoPosition.TopMiddle:
+            case LogoPosition.BottomMiddle:
+                startX = (target.width - logoW) / 2;
+                break;
+
+            case LogoPosition.TopLeft:
+            case LogoPosition.BottomLeft:
+                startX = margin;
+                break;
+
+            default:
+                startX = target.width - logoW - margin;
+                break;
+        }
+
+        int startY;
+        switch (logoPosition)
+        {
+            case LogoPosition.BottomMiddle:
+            case LogoPosition.BottomLeft:
+            case LogoPosition.BottomRight:
+                startY = margin;
+                break;
+
+            default:
+                startY = target.height - logoH - margin;
+                break;
+        }
+
+        startX = Mathf.Clamp(startX, 0, target.width - logoW);
+        startY = Mathf.Clamp(startY, 0, target.height - logoH);
+
+        Color[] background = target.GetPixels(
+            startX, startY, logoW, logoH);
+
+        // Sample the sprite's actual region and blend its transparency.
+        for (int y = 0; y < logoH; y++)
+        {
+            for (int x = 0; x < logoW; x++)
+            {
+                float u = (x + 0.5f) / logoW;
+                float v = (y + 0.5f) / logoH;
+
+                Color logoPixel = source.GetPixelBilinear(
+                    (sourceX + u * sourceW) / source.width,
+                    (sourceY + v * sourceH) / source.height);
+
+                // Respect the UI Image's tint and transparency.
+                logoPixel *= logoImage.color;
+
+                int index = y * logoW + x;
+                Color bg = background[index];
+                float alpha = logoPixel.a;
+
+                background[index] = new Color(
+                    logoPixel.r * alpha + bg.r * (1f - alpha),
+                    logoPixel.g * alpha + bg.g * (1f - alpha),
+                    logoPixel.b * alpha + bg.b * (1f - alpha),
+                    bg.a
+                );
+            }
+        }
+
+        target.SetPixels(startX, startY, logoW, logoH, background);
+        target.Apply();
+
+        Debug.Log(
+            $"[ARScreenshotManager] Logo applied: {logoW}x{logoH}");
     }
 }

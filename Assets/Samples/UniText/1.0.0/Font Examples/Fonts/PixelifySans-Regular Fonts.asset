@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: LightSide.UniText::LightSide.UniTextFonts
   fonts:
     items:
-    - {fileID: 11400000, guid: dfd4dbb55b6412641aedecdc8c5068b5, type: 2}
+    - {fileID: 11400000, guid: 2758f521dcc0ca947aa7bc8481956970, type: 2}
+  fallbackStack: {fileID: 0}
