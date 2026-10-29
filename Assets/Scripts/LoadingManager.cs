@@ -40,4 +40,6 @@ public class LoadingManager : MonoBehaviour
         // 3. Hide loading panel when done
         loadingPanel.SetActive(false);
     }
+
+    
 }

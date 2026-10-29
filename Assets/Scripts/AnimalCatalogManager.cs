@@ -137,8 +137,6 @@ public class AnimalCatalogManager : MonoBehaviour
         }
         UpdateDetailUI(currentSelectedData);
 
-        HideDetailView();
-
         // Catalog panel starts hidden — the AR scan flow is the default entry point.
         if (catalogPanel != null)
             catalogPanel.SetActive(false);
@@ -205,20 +203,118 @@ public class AnimalCatalogManager : MonoBehaviour
 
     public void PopulateCatalog()
     {
-        if (contentContainer == null)
+        if (contentContainer == null && cardsView != null)
         {
-            GameObject contentObject = GameObject.Find("Content");
-
-            if (contentObject != null)
+            ScrollRect sr = cardsView.GetComponent<ScrollRect>();
+            if (sr != null && sr.content != null)
             {
-                contentContainer = contentObject.transform;
+                contentContainer = sr.content;
+            }
+            else
+            {
+                Transform vp = cardsView.transform.Find("Viewport");
+                if (vp != null)
+                {
+                    Transform cnt = vp.Find("Content");
+                    if (cnt != null) contentContainer = cnt;
+                }
+                else
+                {
+                    Transform cnt = cardsView.transform.Find("Content");
+                    if (cnt != null) contentContainer = cnt;
+                }
+            }
+
+            if (sr != null && sr.content == null && contentContainer is RectTransform crt)
+            {
+                sr.content = crt;
             }
         }
 
         if (contentContainer == null)
         {
-            Debug.LogWarning("[AnimalCatalogManager] Content not found.");
+            AnimalCard sceneCard = FindAnyObjectByType<AnimalCard>(FindObjectsInactive.Include);
+            if (sceneCard != null && sceneCard.transform.parent != null)
+            {
+                contentContainer = sceneCard.transform.parent;
+            }
+        }
+
+        if (contentContainer == null)
+        {
+            Debug.LogWarning("[AnimalCatalogManager] Content container not found.");
             return;
+        }
+
+        // Check if cards are already pre-authored in the scene
+        AnimalCard[] existingCards = contentContainer != null
+            ? contentContainer.GetComponentsInChildren<AnimalCard>(true)
+            : (cardsView != null ? cardsView.GetComponentsInChildren<AnimalCard>(true) : null);
+
+        if (existingCards != null && existingCards.Length > 0)
+        {
+            spawnedCards.Clear();
+            foreach (AnimalCard card in existingCards)
+            {
+                if (card == null) continue;
+
+                if (card.animalData == null && animals != null)
+                {
+                    string cardNameLower = card.gameObject.name.ToLower();
+                    card.animalData = animals.Find(a => a != null && (
+                        cardNameLower.Contains(a.animalName.english.ToLower()) ||
+                        a.animalName.english.ToLower().Contains(cardNameLower.Replace("card_", "").Trim())
+                    ));
+                }
+
+                if (card.animalData != null)
+                {
+                    card.SetupCard(card.animalData, SelectAnimal);
+                    if (!spawnedCards.Contains(card))
+                        spawnedCards.Add(card);
+                }
+            }
+
+            if (spawnedCards.Count > 0)
+            {
+                // If there are more animals in the data list without existing cards, spawn them
+                if (animals != null && cardPrefab != null && !cardPrefab.scene.IsValid() && cardPrefab.name != "ContentCard")
+                {
+                    foreach (AnimalData data in animals)
+                    {
+                        if (data == null || spawnedCards.Exists(c => c.animalData == data))
+                            continue;
+
+                        GameObject cardObject = Instantiate(cardPrefab, contentContainer);
+                        cardObject.name = "Card_" + data.animalName.english;
+
+                        RectTransform cardRect = cardObject.GetComponent<RectTransform>();
+                        if (cardRect != null)
+                        {
+                            cardRect.sizeDelta = new Vector2(140f, 160f);
+                            cardRect.localScale = Vector3.one;
+                        }
+
+                        LayoutElement layoutElement = cardObject.GetComponent<LayoutElement>();
+                        if (layoutElement == null) layoutElement = cardObject.AddComponent<LayoutElement>();
+                        layoutElement.preferredWidth = 140f;
+                        layoutElement.preferredHeight = 160f;
+
+                        AnimalCard card = cardObject.GetComponent<AnimalCard>();
+                        if (card != null)
+                        {
+                            card.SetupCard(data, SelectAnimal);
+                            spawnedCards.Add(card);
+                        }
+                    }
+                }
+
+                UpdateCardHighlights();
+                Canvas.ForceUpdateCanvases();
+                if (contentContainer is RectTransform crt)
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(crt);
+                return;
+            }
         }
 
         if (cardPrefab == null || cardPrefab.scene.IsValid() || cardPrefab.name == "ContentCard")
@@ -390,13 +486,25 @@ public class AnimalCatalogManager : MonoBehaviour
 
         currentSelectedData = data;
 
-        // Updates the detail texts once. ARUIManager.SetCurrentAnimal calls UpdateDetailUI too,
-        // but the cache below makes the repeated calls free.
+        // Notify PanelController so it locks this selection and won't revert to default/tracked card
+        PanelController pc = FindAnyObjectByType<PanelController>(FindObjectsInactive.Include);
+        if (pc != null)
+        {
+            pc.SelectAnimalData(data);
+        }
+
         if (arUIManager != null)
         {
             arUIManager.SetCurrentAnimal(data, false);
         }
         else if (modelPreviewController != null)
+        {
+            modelPreviewController.gameObject.SetActive(true);
+            modelPreviewController.ShowModel(data);
+        }
+
+        // Guarantee preview model updates
+        if (modelPreviewController != null && (arUIManager == null || arUIManager.IsShowing3DModel))
         {
             modelPreviewController.gameObject.SetActive(true);
             modelPreviewController.ShowModel(data);
@@ -443,6 +551,22 @@ public class AnimalCatalogManager : MonoBehaviour
         currentSelectedData = data;
         AutoResolveDetailReferences();
 
+        // Ensure detail view (Scroll View) and description text elements are active and visible
+        if (detailView != null && !detailView.activeSelf)
+        {
+            detailView.SetActive(true);
+        }
+
+        if (descriptionText != null && !descriptionText.gameObject.activeSelf)
+        {
+            descriptionText.gameObject.SetActive(true);
+        }
+
+        if (descriptionScrollRect != null && !descriptionScrollRect.gameObject.activeSelf)
+        {
+            descriptionScrollRect.gameObject.SetActive(true);
+        }
+
         string animalName = data.GetLocalizedName();
         string classification = data.GetLocalizedClassification();
         string era = data.GetLocalizedEra();
@@ -486,12 +610,15 @@ public class AnimalCatalogManager : MonoBehaviour
             }
         }
 
-        // ---- Description (always restart from the first line when it changes) ----
-        if (descriptionText != null && description != lastDescription)
+        // ---- Description (always restart from the first line when it changes or when empty) ----
+        if (descriptionText != null)
         {
-            descriptionText.Text = description;
-            lastDescription = description;
-            ScrollDescriptionToTop();
+            if (description != lastDescription || string.IsNullOrEmpty(descriptionText.Text))
+            {
+                descriptionText.Text = description;
+                lastDescription = description;
+                ScrollDescriptionToTop();
+            }
         }
 
         // ---- Fun fact ----
@@ -518,20 +645,25 @@ public class AnimalCatalogManager : MonoBehaviour
             }
         }
 
-        // ---- Card highlight (only when the selection actually changed) ----
-        if (lastHighlightedData != data)
+        // ---- Card highlight ----
+        UpdateCardHighlights(data);
+    }
+
+    public void UpdateCardHighlights(AnimalData data = null)
+    {
+        if (data == null)
+            data = currentSelectedData;
+
+        lastHighlightedData = data;
+
+        foreach (AnimalCard card in spawnedCards)
         {
-            lastHighlightedData = data;
-
-            foreach (AnimalCard card in spawnedCards)
+            if (card != null)
             {
-                if (card != null)
-                {
-                    bool selected = card.animalData == data ||
-                        (card.animalData != null && card.animalData.animalName.english == data.animalName.english);
+                bool selected = data != null && (card.animalData == data ||
+                    (card.animalData != null && card.animalData.animalName.english == data.animalName.english));
 
-                    card.SetSelected(selected);
-                }
+                card.SetSelected(selected);
             }
         }
     }
@@ -588,6 +720,11 @@ public class AnimalCatalogManager : MonoBehaviour
         if (descriptionScrollRect == null && descriptionText != null)
         {
             descriptionScrollRect = descriptionText.GetComponentInParent<ScrollRect>(true);
+        }
+
+        if (descriptionScrollRect != null && !descriptionScrollRect.gameObject.activeSelf)
+        {
+            descriptionScrollRect.gameObject.SetActive(true);
         }
 
         if (descriptionScrollRect == null) return;

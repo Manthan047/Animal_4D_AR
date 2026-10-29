@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Vuforia;
 using LightSide; // UniText namespace
 
@@ -23,13 +24,13 @@ public class PanelController : MonoBehaviour
     [SerializeField] private GameObject infoCardPanel;
     [Tooltip("The Settings panel (the image box that holds the Language / Sound buttons).")]
     [SerializeField] private GameObject settingPanel;
-
+     
     [Header("Interactive Buttons & Header")]
     [SerializeField] private Button okButton;
     [SerializeField] private Button closeInstructionButton;
     [Tooltip("The main SETTING button (the one the user taps to open the Setting Panel). Needs a Button component. Must NOT be a child of the Setting Panel.")]
     [SerializeField] private GameObject LanguagesettingButton;
-    [Tooltip("The Back button inside the Setting Panel. Auto-found (a Button named like 'back') if left empty.")]
+    [Tooltip("The Back button inside the Setting Panel. Closes the whole settings menu. Auto-found (a Button named like 'back') if left empty.")]
     [SerializeField] private Button settingBackButton;
     [SerializeField] private GameObject logoObject;
     [Tooltip("The Info button. Must NOT be a child of the logo, setting button or actions panel.")]
@@ -43,18 +44,19 @@ public class PanelController : MonoBehaviour
     [SerializeField] private Button languageOptionButton;
     [Tooltip("The language list / sub panel (e.g. 'Language_sub_panel'). Shown INSTEAD of the Setting Panel.")]
     [SerializeField] private GameObject languageSubPanel;
-    [Tooltip("Back button inside the language sub panel. Returns to the Setting Panel. Auto-found (a Button named like 'back') if left empty.")]
+    [Tooltip("Back button inside the language sub panel. Closes the whole settings menu. Auto-found (a Button named like 'back') if left empty.")]
     [SerializeField] private Button languageSubBackButton;
 
     [Tooltip("Button inside the Setting Panel that opens the sound options (e.g. 'Sound_option').")]
     [SerializeField] private Button soundOptionButton;
     [Tooltip("The sound options sub panel (e.g. 'Sound_sub_panel'). Shown INSTEAD of the Setting Panel.")]
     [SerializeField] private GameObject soundSubPanel;
-    [Tooltip("Back button inside the sound sub panel. Returns to the Setting Panel. Auto-found (a Button named like 'back') if left empty.")]
+    [Tooltip("Back button inside the sound sub panel. Closes the whole settings menu. Auto-found (a Button named like 'back') if left empty.")]
     [SerializeField] private Button soundSubBackButton;
 
     [Header("Loading UI Elements")]
     [SerializeField] private Slider progressBar;
+    [Tooltip("Percentage text shown while loading.")]
     [SerializeField] private UniText progressText;
     [SerializeField] private GameObject loadingImage;
 
@@ -72,16 +74,29 @@ public class PanelController : MonoBehaviour
     [Tooltip("Seconds to wait after the card is lost before hiding the action buttons (prevents flicker).")]
     [SerializeField] private float hideDelay = 0.5f;
 
+    [Header("Default Card")]
+    [Tooltip("Card shown when no card is tracked. If empty, the first card in the scene (sorted by name) is used.")]
+    [SerializeField] private ObserverBehaviour defaultCard;
+
+    [Header("Card Selection (tap / next / previous)")]
+    [Tooltip("Camera used to detect taps on cards. Uses Camera.main if empty.")]
+    [SerializeField] private Camera arCamera;
+    [Tooltip("Optional UI button: show the next card's details.")]
+    [SerializeField] private Button nextCardButton;
+    [Tooltip("Optional UI button: show the previous card's details.")]
+    [SerializeField] private Button previousCardButton;
+    [SerializeField] private float tapRayDistance = 100f;
+    [Tooltip("Swipe left / right at least this many pixels to go to the next / previous card.")]
+    [SerializeField] private float swipeMinDistance = 80f;
+
     [Header("Cross-Reference")]
     [SerializeField] private ARUIManager arUIManager;
+    [SerializeField] private AnimalCatalogManager animalCatalogManager;
 
     private Coroutine loadingRoutine;
-    private CanvasGroup progressTextGroup;
     private Transform cachedBgChild;
     private Image cachedBgChildImage;
     private Image cachedPanelImage;
-
-    private string cachedLoadPrefix = "Loading";
     private int lastShownPercent = -1;
 
     // Card detection state
@@ -90,6 +105,18 @@ public class PanelController : MonoBehaviour
     private float lostTimer;
     private bool infoModeActive;
     private readonly List<ObserverBehaviour> cardTargets = new List<ObserverBehaviour>();
+    private ObserverBehaviour shownCard;   // card whose description is currently displayed
+    private ObserverBehaviour manualCard;  // card the user picked by tapping / next / previous
+    private AnimalData manualAnimalData;   // animal data the user picked from UI catalog or code
+    private ObserverBehaviour lastTrackedCard;
+    private readonly List<RaycastResult> uiHits = new List<RaycastResult>();
+
+    // Pointer state (tap / swipe)
+    private Vector2 pressPos;
+    private bool pressing;
+    private int lastInfoClickFrame = -1;
+
+    public GameObject InfoButtonObject => Info_button;
 
     // =========================================================
     // LIFECYCLE
@@ -99,7 +126,7 @@ public class PanelController : MonoBehaviour
     {
         if (FindAnyObjectByType<LanguageManager>(FindObjectsInactive.Include) == null)
             gameObject.AddComponent<LanguageManager>();
-
+        
         AutoResolveReferences();
         DetachSubPanelsFromSettingPanel();
         CacheBackgroundRefs();
@@ -110,16 +137,6 @@ public class PanelController : MonoBehaviour
             progressBar.minValue = 0f;
             progressBar.maxValue = 1f;
             progressBar.interactable = false;
-        }
-
-        if (progressText != null)
-        {
-            progressTextGroup = progressText.GetComponent<CanvasGroup>();
-            if (progressTextGroup == null)
-                progressTextGroup = progressText.gameObject.AddComponent<CanvasGroup>();
-
-            progressTextGroup.blocksRaycasts = false;
-            progressTextGroup.interactable = false;
         }
     }
 
@@ -144,24 +161,30 @@ public class PanelController : MonoBehaviour
         if (actionsButtonsPanel != null) actionsButtonsPanel.SetActive(false);
         if (infoCardPanel != null) infoCardPanel.SetActive(false);
         if (infoBackButton != null) infoBackButton.gameObject.SetActive(false);
-
+      
         introFinished = false;
         actionsVisible = false;
         lostTimer = 0f;
+        shownCard = null;
 
         FindCardTargets();
-
-        // Pay the expensive UniText first-use cost NOW, while the user reads the caution box,
-        // instead of at the moment OK is clicked.
-        StartCoroutine(PrewarmProgressText());
     }
 
     private void Update()
     {
-        // Action buttons only exist after the intro is done AND a card is being tracked.
-        if (!introFinished || infoModeActive || actionsButtonsPanel == null)
+        // While the info screen is open, keep the description in sync:
+        // tracked card if there is one, otherwise the default (first) card.
+        if (infoModeActive)
+        {
+            HandlePointer();
+            RefreshShownCard();   // tracked card, a tapped / swiped card, or the first card
+            return;
+        }
+
+        if (!introFinished || actionsButtonsPanel == null)
             return;
 
+        // Action buttons only exist after the intro is done AND a card is being tracked.
         bool cardTracked = IsAnyCardTracked();
 
         if (cardTracked)
@@ -192,6 +215,12 @@ public class PanelController : MonoBehaviour
         // Finds every Vuforia target in the scene (Image Targets, etc.), including inactive ones.
         cardTargets.Clear();
         cardTargets.AddRange(FindObjectsByType<ObserverBehaviour>(FindObjectsInactive.Include));
+
+        // Stable order: by name (e.g. Card_01, Card_02...). Change to sibling index if you prefer.
+        cardTargets.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
+
+        if (defaultCard == null && cardTargets.Count > 0)
+            defaultCard = cardTargets[0];
     }
 
     // Polled every frame, so the result is always the CURRENT state
@@ -210,29 +239,278 @@ public class PanelController : MonoBehaviour
         return false;
     }
 
-    // =========================================================
-    // PREWARM (removes the freeze on first click)
-    // =========================================================
-
-    private IEnumerator PrewarmProgressText()
+    private ObserverBehaviour GetTrackedCard()
     {
-        if (progressText == null || progressTextGroup == null) yield break;
+        if (ARAnimalManager.Instance != null && ARAnimalManager.Instance.HasActiveAnimal && ARAnimalManager.Instance.SelectedAnimal != null)
+        {
+            Component c = ARAnimalManager.Instance.SelectedAnimal as Component;
+            if (c != null)
+            {
+                ObserverBehaviour obs = c.GetComponentInParent<ObserverBehaviour>();
+                if (obs != null) return obs;
+            }
+        }
 
-        progressTextGroup.alpha = 0f; // invisible while warming up
-        progressText.gameObject.SetActive(true);
+        for (int i = 0; i < cardTargets.Count; i++)
+        {
+            ObserverBehaviour t = cardTargets[i];
+            if (t != null && t.isActiveAndEnabled && t.TargetStatus.Status == Status.TRACKED)
+                return t;
+        }
+        return null;
+    }
 
-        cachedLoadPrefix = BuildLoadPrefix();
-        progressText.Text = $"{cachedLoadPrefix}... 100%"; // widest string, builds needed glyphs
+    // Priority: card the user picked > tracked card > default (first) card.
+    // A newly tracked card replaces the user's pick.
+    private ObserverBehaviour GetSelectedCard()
+    {
+        ObserverBehaviour tracked = GetTrackedCard();
+        if (tracked != lastTrackedCard)
+        {
+            lastTrackedCard = tracked;
+            if (tracked != null)
+            {
+                manualCard = null;
+                manualAnimalData = null;
+            }
+        }
 
-        yield return null;
-        yield return null;
+        if (manualCard != null) return manualCard;
+        return tracked != null ? tracked : defaultCard;
+    }
 
-        progressTextGroup.alpha = 1f;
+    // Updates the displayed description only when the selected card changes
+    // (or always, when force is true).
+    private void RefreshShownCard(bool force = false)
+    {
+        ObserverBehaviour tracked = GetTrackedCard();
+        if (tracked != lastTrackedCard)
+        {
+            lastTrackedCard = tracked;
+            if (tracked != null)
+            {
+                manualCard = null;
+                manualAnimalData = null;
+            }
+        }
 
-        if (loadingRoutine == null)
-            progressText.gameObject.SetActive(false);
+        // If user manually picked an animal card in the info panel UI, respect that selection!
+        if (manualAnimalData != null)
+        {
+            if (force)
+            {
+                if (arUIManager != null) arUIManager.SetCurrentAnimal(manualAnimalData, false);
+                else if (animalCatalogManager != null) animalCatalogManager.UpdateDetailUI(manualAnimalData);
+            }
+            return;
+        }
 
-        lastShownPercent = -1;
+        ObserverBehaviour card = GetSelectedCard();
+        if (!force && card != null && card == shownCard) return;
+
+        shownCard = card;
+        ApplyCardToUI(card);
+    }
+
+    // Shows this card's animal in the info card (description, 3D / 2D viewer, audio)
+    // using ARUIManager's existing public SetCurrentAnimal(...).
+    private void ApplyCardToUI(ObserverBehaviour card)
+    {
+        if (arUIManager == null)
+        {
+            if (infoCardPanel != null) infoCardPanel.SetActive(true);
+            return;
+        }
+
+        AnimalData data = null;
+
+        if (card != null)
+        {
+            IAnimalAction animal = card.GetComponentInChildren<IAnimalAction>(true);
+            if (animal == null) animal = card.GetComponentInParent<IAnimalAction>(true);
+            if (animal != null) data = animal.GetAnimalData();
+        }
+
+        if (data == null && ARAnimalManager.Instance != null && ARAnimalManager.Instance.HasActiveAnimal && ARAnimalManager.Instance.SelectedAnimal != null)
+        {
+            data = ARAnimalManager.Instance.SelectedAnimal.GetAnimalData();
+        }
+
+        // If no animal is tracked, fall back to the first animal card
+        if (data == null)
+        {
+            data = GetDefaultFirstAnimalData();
+        }
+
+        if (data != null)
+        {
+            arUIManager.SetCurrentAnimal(data, true);   // true = open / refresh the info card
+        }
+        else
+        {
+            if (infoCardPanel != null) infoCardPanel.SetActive(true);
+            arUIManager.ShowInfoCard();
+        }
+    }
+
+    private AnimalData GetDefaultFirstAnimalData()
+    {
+        if (animalCatalogManager != null && animalCatalogManager.animals != null && animalCatalogManager.animals.Count > 0)
+        {
+            for (int i = 0; i < animalCatalogManager.animals.Count; i++)
+            {
+                if (animalCatalogManager.animals[i] != null)
+                    return animalCatalogManager.animals[i];
+            }
+        }
+
+        if (defaultCard != null)
+        {
+            IAnimalAction animal = defaultCard.GetComponentInChildren<IAnimalAction>(true);
+            if (animal == null) animal = defaultCard.GetComponentInParent<IAnimalAction>(true);
+            if (animal != null && animal.GetAnimalData() != null) return animal.GetAnimalData();
+        }
+
+        AnimalData[] all = Resources.LoadAll<AnimalData>("Data");
+        if (all == null || all.Length == 0) all = Resources.LoadAll<AnimalData>("");
+        if (all != null && all.Length > 0) return all[0];
+
+        return null;
+    }
+
+    /// <summary>
+    /// Called when an animal card is selected in the UI.
+    /// Locks manual selection so RefreshShownCard won't snap back to default/tracked card.
+    /// </summary>
+    public void SelectAnimalData(AnimalData data)
+    {
+        if (data == null) return;
+        manualAnimalData = data;
+
+        manualCard = null;
+        for (int i = 0; i < cardTargets.Count; i++)
+        {
+            ObserverBehaviour t = cardTargets[i];
+            if (t == null) continue;
+            IAnimalAction action = t.GetComponentInChildren<IAnimalAction>(true);
+            if (action != null && action.GetAnimalData() == data)
+            {
+                manualCard = t;
+                break;
+            }
+            if (t.name.ToLowerInvariant().Contains(data.animalName.english.ToLowerInvariant()))
+            {
+                manualCard = t;
+                break;
+            }
+        }
+
+        shownCard = manualCard;
+    }
+
+    /// <summary>Show the details of a specific card (call from a UI button too).</summary>
+    public void SelectCard(ObserverBehaviour card)
+    {
+        if (card == null) return;
+        manualAnimalData = null;
+        manualCard = card;
+        if (infoModeActive)
+            RefreshShownCard(true);
+    }
+
+    public void SelectNextCard()     { StepCard(+1); }
+    public void SelectPreviousCard() { StepCard(-1); }
+
+    private void StepCard(int dir)
+    {
+        if (cardTargets.Count == 0) return;
+        int current = shownCard != null ? cardTargets.IndexOf(shownCard) : -1;
+        int next = (current + dir + cardTargets.Count) % cardTargets.Count;
+        SelectCard(cardTargets[next]);
+    }
+
+    // =========================================================
+    // TAP / SWIPE (info screen)
+    //   tap on a card (needs a Collider)  -> that card
+    //   swipe left / right                -> next / previous card
+    // =========================================================
+
+    private void HandlePointer()
+    {
+        if (!GetPointer(out Vector2 pos, out bool down, out bool up)) return;
+
+        if (down)
+        {
+            pressing = !IsPointerOverButton(pos);
+            pressPos = pos;
+            return;
+        }
+
+        if (!up || !pressing) return;
+        pressing = false;
+
+        Vector2 delta = pos - pressPos;
+
+        if (Mathf.Abs(delta.x) >= swipeMinDistance && Mathf.Abs(delta.x) > Mathf.Abs(delta.y) * 1.5f)
+        {
+            if (delta.x < 0f) SelectNextCard();
+            else SelectPreviousCard();
+            return;
+        }
+
+        if (delta.magnitude < 30f)
+            TapAt(pos);
+    }
+
+    private bool IsPointerOverButton(Vector2 pos)
+    {
+        if (EventSystem.current == null) return false;
+
+        uiHits.Clear();
+        EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current) { position = pos }, uiHits);
+        return uiHits.Count > 0 && uiHits[0].gameObject.GetComponentInParent<Selectable>() != null;
+    }
+
+    private void TapAt(Vector2 pos)
+    {
+        Camera cam = arCamera != null ? arCamera : Camera.main;
+        if (cam == null) return;
+
+        if (Physics.Raycast(cam.ScreenPointToRay(pos), out RaycastHit hit, tapRayDistance))
+        {
+            ObserverBehaviour card = hit.collider.GetComponentInParent<ObserverBehaviour>();
+            if (card != null) SelectCard(card);
+        }
+    }
+
+    private bool GetPointer(out Vector2 pos, out bool down, out bool up)
+    {
+        pos = default; down = false; up = false;
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+        var ts = UnityEngine.InputSystem.Touchscreen.current;
+        if (ts != null)
+        {
+            var t = ts.primaryTouch;
+            if (t.press.wasPressedThisFrame)  { pos = t.position.ReadValue(); down = true; return true; }
+            if (t.press.wasReleasedThisFrame) { pos = t.position.ReadValue(); up = true;   return true; }
+        }
+        var ms = UnityEngine.InputSystem.Mouse.current;
+        if (ms != null)
+        {
+            if (ms.leftButton.wasPressedThisFrame)  { pos = ms.position.ReadValue(); down = true; return true; }
+            if (ms.leftButton.wasReleasedThisFrame) { pos = ms.position.ReadValue(); up = true;   return true; }
+        }
+#else
+        if (Input.touchCount > 0)
+        {
+            Touch t = Input.GetTouch(0);
+            if (t.phase == TouchPhase.Began) { pos = t.position; down = true; return true; }
+            if (t.phase == TouchPhase.Ended || t.phase == TouchPhase.Canceled) { pos = t.position; up = true; return true; }
+        }
+        if (Input.GetMouseButtonDown(0)) { pos = Input.mousePosition; down = true; return true; }
+        if (Input.GetMouseButtonUp(0))   { pos = Input.mousePosition; up = true;   return true; }
+#endif
+        return false;
     }
 
     // =========================================================
@@ -244,12 +522,15 @@ public class PanelController : MonoBehaviour
         if (arUIManager == null)
             arUIManager = FindAnyObjectByType<ARUIManager>(FindObjectsInactive.Include);
 
+        if (animalCatalogManager == null)
+            animalCatalogManager = FindAnyObjectByType<AnimalCatalogManager>(FindObjectsInactive.Include);
+
         // Only do the expensive full-scene scan if something is actually missing
         bool needScan =
             cautionObject == null || loadingPanel == null || instructionPanel == null ||
             LanguagesettingButton == null || settingPanel == null ||
             logoObject == null || backgroundObject == null || actionsButtonsPanel == null ||
-            infoCardPanel == null || progressBar == null || progressText == null || okButton == null;
+            infoCardPanel == null || progressBar == null || okButton == null;
 
         if (needScan)
         {
@@ -291,9 +572,6 @@ public class PanelController : MonoBehaviour
                     if (s != null) progressBar = s;
                 }
 
-                if (progressText == null && (tName == "ProgressText" || tName == "LoadingText" || tName == "Progress_Text"))
-                    progressText = t.GetComponent<UniText>();
-
                 if (okButton == null && (tName == "ok_button" || tName == "OK_Button" || tName == "okButton"))
                     okButton = t.GetComponent<Button>();
             }
@@ -303,18 +581,6 @@ public class PanelController : MonoBehaviour
         {
             if (progressBar == null)
                 progressBar = loadingPanel.GetComponentInChildren<Slider>(true);
-
-            if (progressText == null)
-            {
-                foreach (UniText u in loadingPanel.GetComponentsInChildren<UniText>(true))
-                {
-                    if (cautionObject != null && u.transform.IsChildOf(cautionObject.transform))
-                        continue;
-
-                    progressText = u;
-                    break;
-                }
-            }
         }
 
         if (okButton == null && cautionObject != null)
@@ -404,6 +670,33 @@ public class PanelController : MonoBehaviour
         // Pass 3: back buttons inside the sub panels
         if (languageSubBackButton == null) languageSubBackButton = FindBackButtonIn(languageSubPanel);
         if (soundSubBackButton == null)    soundSubBackButton    = FindBackButtonIn(soundSubPanel);
+
+        // Pass 4 (fallback): find the Setting panel's own Back button even if the
+        // Button component is on a child object or the "back" name is on the parent.
+        if (settingBackButton == null)
+        {
+            foreach (Button b in settingPanel.GetComponentsInChildren<Button>(true))
+            {
+                if (languageSubPanel != null && b.transform.IsChildOf(languageSubPanel.transform)) continue;
+                if (soundSubPanel != null && b.transform.IsChildOf(soundSubPanel.transform)) continue;
+
+                string own = b.name.ToLowerInvariant();
+                string parent = b.transform.parent != null
+                    ? b.transform.parent.name.ToLowerInvariant() : "";
+
+                if (own.Contains("back") || parent.Contains("back"))
+                {
+                    settingBackButton = b;
+                    break;
+                }
+            }
+        }
+
+        if (settingBackButton == null)
+        {
+            Debug.LogWarning("PanelController: Setting Back button not found. " +
+                             "Assign it manually in the Inspector (Setting Back Button).");
+        }
     }
 
     private void MatchSubPanel(Transform t)
@@ -535,8 +828,21 @@ public class PanelController : MonoBehaviour
             Button infoBtn = Info_button.GetComponent<Button>();
             if (infoBtn != null)
             {
-                infoBtn.onClick.RemoveListener(OnInfoButtonClicked);
-                infoBtn.onClick.AddListener(OnInfoButtonClicked);
+                bool hasPersistent = false;
+                for (int i = 0; i < infoBtn.onClick.GetPersistentEventCount(); i++)
+                {
+                    if (infoBtn.onClick.GetPersistentMethodName(i) == nameof(OnInfoButtonClicked))
+                    {
+                        hasPersistent = true;
+                        break;
+                    }
+                }
+
+                if (!hasPersistent)
+                {
+                    infoBtn.onClick.RemoveListener(OnInfoButtonClicked);
+                    infoBtn.onClick.AddListener(OnInfoButtonClicked);
+                }
             }
         }
 
@@ -544,6 +850,18 @@ public class PanelController : MonoBehaviour
         {
             infoBackButton.onClick.RemoveListener(OnInfoBackButtonClicked);
             infoBackButton.onClick.AddListener(OnInfoBackButtonClicked);
+        }
+
+        if (nextCardButton != null)
+        {
+            nextCardButton.onClick.RemoveListener(SelectNextCard);
+            nextCardButton.onClick.AddListener(SelectNextCard);
+        }
+
+        if (previousCardButton != null)
+        {
+            previousCardButton.onClick.RemoveListener(SelectPreviousCard);
+            previousCardButton.onClick.AddListener(SelectPreviousCard);
         }
     }
 
@@ -586,6 +904,12 @@ public class PanelController : MonoBehaviour
 
         if (infoBackButton != null)
             infoBackButton.onClick.RemoveListener(OnInfoBackButtonClicked);
+
+        if (nextCardButton != null)
+            nextCardButton.onClick.RemoveListener(SelectNextCard);
+
+        if (previousCardButton != null)
+            previousCardButton.onClick.RemoveListener(SelectPreviousCard);
     }
 
     // =========================================================
@@ -594,8 +918,7 @@ public class PanelController : MonoBehaviour
     //   setting_button      -> opens Setting_panel (closes everything if already open)
     //   Language_option     -> Setting_panel becomes INVISIBLE, Language_sub_panel shows
     //   Sound_option        -> Setting_panel becomes INVISIBLE, Sound_sub_panel shows
-    //   sub panel Back      -> sub panel closes, Setting_panel shows again
-    //   Setting_panel Back  -> closes everything
+    //   Any Back button     -> closes EVERYTHING (sub panels + Setting_panel)
     // =========================================================
 
     private bool IsSettingsOpen()
@@ -621,13 +944,9 @@ public class PanelController : MonoBehaviour
         }
 
         if (IsSettingsOpen())
-        {
             CloseSettingsCompletely();
-        }
         else
-        {
             ShowSettingPanel();
-        }
     }
 
     /// <summary>
@@ -639,11 +958,12 @@ public class PanelController : MonoBehaviour
     }
 
     /// <summary>
-    /// Back button inside a sub panel: goes back to the Setting panel.
+    /// Back button inside a sub panel (Language / Sound): closes the whole settings menu
+    /// (sub panel + Setting panel).
     /// </summary>
     public void OnSubPanelBackClicked()
     {
-        ShowSettingPanel();
+        CloseSettingsCompletely();
     }
 
     public void OnLanguageOptionClicked() { OpenSubPanel(languageSubPanel); }
@@ -674,7 +994,7 @@ public class PanelController : MonoBehaviour
         CloseSubPanels();
 
         if (settingPanel != null)
-            settingPanel.SetActive(false);   // <- Setting panel becomes invisible
+            settingPanel.SetActive(false);   // Setting panel becomes invisible
 
         panel.SetActive(true);
         panel.transform.SetAsLastSibling();  // draw on top
@@ -711,6 +1031,20 @@ public class PanelController : MonoBehaviour
     /// </summary>
     public void OnInfoButtonClicked()
     {
+        if (Time.frameCount == lastInfoClickFrame)
+            return; // Ignore duplicate calls in the exact same frame
+        lastInfoClickFrame = Time.frameCount;
+
+        if (infoModeActive)
+        {
+            ObserverBehaviour currentCard = GetSelectedCard();
+            if (currentCard == shownCard && shownCard != null)
+            {
+                SetInfoMode(false);
+                return;
+            }
+        }
+
         SetInfoMode(true);
     }
 
@@ -725,7 +1059,22 @@ public class PanelController : MonoBehaviour
 
     private void SetInfoMode(bool enable)
     {
-        if (!introFinished || infoModeActive == enable) return;
+        introFinished = true;
+        if (arUIManager != null)
+            arUIManager.OnIntroFinished();
+
+        if (infoModeActive == enable)
+        {
+            if (enable)
+            {
+                // Re-clicking info button when already open: refresh immediately to detected model
+                manualCard = null;
+                manualAnimalData = null;
+                shownCard = null;
+                RefreshShownCard(true);
+            }
+            return;
+        }
 
         infoModeActive = enable;
         bool normalMode = !enable;
@@ -747,12 +1096,25 @@ public class PanelController : MonoBehaviour
             // Close the whole settings menu and the action buttons while in info mode
             CloseSettingsCompletely();
             SetActionsVisible(false);
+
+            if (infoCardPanel != null)
+                infoCardPanel.SetActive(true);
+
+            shownCard = null;
+            manualCard = null;
+            manualAnimalData = null;
+
+            RefreshShownCard(true);
         }
         else
         {
             // Close the info screen. The action buttons come back by themselves
             // once a card is tracked again (see Update).
-            if (infoCardPanel != null) infoCardPanel.SetActive(false);
+            shownCard = null;
+            manualCard = null;
+            manualAnimalData = null;
+            if (arUIManager != null) arUIManager.HideInfoCard();
+            else if (infoCardPanel != null) infoCardPanel.SetActive(false);
         }
     }
 
@@ -770,10 +1132,6 @@ public class PanelController : MonoBehaviour
 
         SetBackgroundVisible(true);
         if (loadingPanel != null) loadingPanel.SetActive(true);
-
-        // Refresh the localized prefix ONCE (not every frame)
-        cachedLoadPrefix = BuildLoadPrefix();
-        lastShownPercent = -1;
 
         SetLoadingBarVisible(true);
         SetProgress(0f);
@@ -806,6 +1164,7 @@ public class PanelController : MonoBehaviour
         if (instructionPanel != null) instructionPanel.SetActive(true);
         if (logoObject != null) logoObject.SetActive(true);
         if (LanguagesettingButton != null) LanguagesettingButton.SetActive(true);
+        if (Info_button != null) Info_button.SetActive(true);
 
         loadingRoutine = null;
     }
@@ -818,23 +1177,19 @@ public class PanelController : MonoBehaviour
             if (visible) progressBar.value = 0f;
         }
 
+        // Percentage text follows the loading bar
         if (progressText != null)
+        {
             progressText.gameObject.SetActive(visible);
+            if (visible)
+            {
+                lastShownPercent = -1;   // force a refresh
+                SetProgressText(0f);
+            }
+        }
 
         if (loadingImage != null)
-            loadingImage.gameObject.SetActive(visible);
-    }
-
-    private string BuildLoadPrefix()
-    {
-        string prefix = LanguageManager.Instance != null
-            ? LanguageManager.Instance.GetText("lbl_loading", "Loading...")
-            : "Loading...";
-
-        if (prefix.EndsWith("..."))
-            prefix = prefix.Substring(0, prefix.Length - 3).Trim();
-
-        return prefix;
+            loadingImage.SetActive(visible);
     }
 
     private void SetProgress(float progress)
@@ -842,15 +1197,18 @@ public class PanelController : MonoBehaviour
         if (progressBar != null)
             progressBar.value = progress;
 
-        // Only touch the (expensive) UniText when the visible number changes
-        int percent = Mathf.RoundToInt(progress * 100f);
-        if (percent == lastShownPercent)
-            return;
+        SetProgressText(progress);
+    }
 
+    private void SetProgressText(float progress)
+    {
+        if (progressText == null) return;
+
+        int percent = Mathf.RoundToInt(Mathf.Clamp01(progress) * 100f);
+        if (percent == lastShownPercent) return;   // only re-layout the text when the number changes
         lastShownPercent = percent;
 
-        if (progressText != null)
-            progressText.Text = $"{cachedLoadPrefix}... {percent}%";
+        progressText.Text = $"Loading {percent}%";
     }
 
     // =========================================================

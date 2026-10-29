@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: e4cbab83af6de4bc29177592e46c24bc
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 87620
+  packageName: Progress Bar Kit
+  packageVersion: 5.0
+  assetPath: Assets/2D Progress Bar Toolkit/Scripts/ClassicProgressBar.cs
+  uploadId: 966816

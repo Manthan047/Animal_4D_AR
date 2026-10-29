@@ -11,6 +11,7 @@ public class LanguageManager : MonoBehaviour
     public const string LANG_ENGLISH = "English";
     public const string LANG_SPANISH = "Spanish";
     public const string LANG_HINDI = "Hindi";
+    public const string LANG_TAMIL = "Tamil";
 
     private const string PREF_KEY_LANGUAGE = "App_Selected_Language";
 
@@ -31,6 +32,7 @@ public class LanguageManager : MonoBehaviour
     [SerializeField] private Button englishButton;
     [SerializeField] private Button spanishButton;
     [SerializeField] private Button hindiButton;
+    [SerializeField] private Button tamilButton;
     [SerializeField] private Button submitButton;
 
     [Header("Selected Button Border")]
@@ -41,17 +43,27 @@ public class LanguageManager : MonoBehaviour
     private static readonly Dictionary<string, Dictionary<string, string>> StringTable = new Dictionary<string, Dictionary<string, string>>
     {
         // ---------------- Caution Panel ----------------
+         ["caution_title"] = new Dictionary<string, string>
+        {
+            [LANG_ENGLISH] = "Caution",
+            [LANG_SPANISH] = "Precaución",
+            [LANG_HINDI] = "सावधानी",
+            [LANG_TAMIL] = "எச்சரிக்கை"
+        },
+
         ["lbl_parental_supervision"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Parental Supervision Required: Children must be supervised by an adult at all times while using this app to prevent stumbles, falls, or collisions with objects.",
             [LANG_SPANISH] = "Supervisión de los Padres Requerida:\nAsegúrese de que un adulto supervise a los niños mientras usan esta aplicación de Realidad Aumentada.",
-            [LANG_HINDI] = "अभिभावक पर्यवेक्षण आवश्यक:\nकृपया सुनिश्चित करें कि इस ऑगमेंटेड रियलिटी ऐप का उपयोग करते समय बच्चे किसी वयस्क की देखरेख में हों।"
+            [LANG_HINDI] = "अभिभावक पर्यवेक्षण आवश्यक:\nकृपया सुनिश्चित करें कि इस ऑगमेंटेड रियलिटी ऐप का उपयोग करते समय बच्चे किसी वयस्क की देखरेख में हों।",
+            [LANG_TAMIL] = "பெற்றோரின் கண்காணிப்பு அவசியம்: இந்தச் செயலியைப் பயன்படுத்தும்போது, குழந்தைகள் தடுமாறுதல், கீழே விழுதல் அல்லது பொருட்களின் மீது மோதுதல் போன்ற விபத்துகளைத் தவிர்க்க, எல்லா நேரங்களிலும் ஒரு வயது வந்தவரின் கண்காணிப்பில் இருக்க வேண்டும்."
         },
         ["btn_ok"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "OK",
             [LANG_SPANISH] = "Aceptar",
-            [LANG_HINDI] = "ठीक है"
+            [LANG_HINDI] = "ठीक है",
+            [LANG_TAMIL] = "சரி"
         },
 
         // ---------------- Loading Panel ----------------
@@ -59,7 +71,8 @@ public class LanguageManager : MonoBehaviour
         {
             [LANG_ENGLISH] = "Loading...",
             [LANG_SPANISH] = "Cargando...",
-            [LANG_HINDI] = "लोड हो रहा है..."
+            [LANG_HINDI] = "लोड हो रहा है...",
+            [LANG_TAMIL] = "ஏற்றப்படுகிறது..."
         },
 
         // ---------------- Instructions Panel ----------------
@@ -67,25 +80,29 @@ public class LanguageManager : MonoBehaviour
         {
             [LANG_ENGLISH] = "Instructions",
             [LANG_SPANISH] = "Cómo Jugar",
-            [LANG_HINDI] = "कैसे खेलें"
+            [LANG_HINDI] = "कैसे खेलें",
+            [LANG_TAMIL] = "வழிமுறைகள்"
         },
         ["instruction_step1"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "1. Place the card facing the camera, and it will automatically scan the image.",
             [LANG_SPANISH] = "1. Apunta la cámara directamente a una tarjeta Animal 4D+ para darle vida al animal.",
-            [LANG_HINDI] = "1. जानवर को 4D AR में देखने के लिए अपने कैमरे को एनिमल 4D+ कार्ड की ओर रखें।"
+            [LANG_HINDI] = "1. जानवर को 4D AR में देखने के लिए अपने कैमरे को एनिमल 4D+ कार्ड की ओर रखें।",
+            [LANG_TAMIL] = "1. அட்டையை கேமராவை நோக்கி வைக்கவும். படம் தானாகவே ஸ்கேன் செய்யப்படும்."
         },
         ["instruction_step2"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "2. If you don't have the Animal 4D+ card set, you can get it here.",
             [LANG_SPANISH] = "2. ¿No tienes tarjetas físicas? Toca 'Obtener Tarjetas' para descargarlas e imprimirlas.",
-            [LANG_HINDI] = "2. क्या आपके पास कार्ड नहीं हैं? कार्ड डाउनलोड और प्रिंट करने के लिए 'कार्ड प्राप्त करें' दबाएं।"
+            [LANG_HINDI] = "2. क्या आपके पास कार्ड नहीं हैं? कार्ड डाउनलोड और प्रिंट करने के लिए 'कार्ड प्राप्त करें' दबाएं।",
+            [LANG_TAMIL] = "2. உங்களிடம் Animal 4D+ அட்டைகளின் தொகுப்பு இல்லையெனில், அதை இங்கே பெற்றுக்கொள்ளலாம்."
         },
         ["btn_get_card"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Get Cards",
             [LANG_SPANISH] = "Obtener Tarjetas",
-            [LANG_HINDI] = "कार्ड प्राप्त करें"
+            [LANG_HINDI] = "कार्ड प्राप्त करें",
+            [LANG_TAMIL] = "அட்டைகளைப் பெறுங்கள்"
         },
 
         // ---------------- Setting Panel ----------------
@@ -93,49 +110,64 @@ public class LanguageManager : MonoBehaviour
         {
             [LANG_ENGLISH] = "Select Language",
             [LANG_SPANISH] = "Seleccionar Idioma",
-            [LANG_HINDI] = "भाषा चुनें"
+            [LANG_HINDI] = "भाषा चुनें",
+            [LANG_TAMIL] = "மொழியைத் தேர்ந்தெடுக்கவும்"
         },
         ["btn_lang_english"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "English",
             [LANG_SPANISH] = "English",
-            [LANG_HINDI] = "English (अंग्रेज़ी)"
+            [LANG_HINDI] = "English (अंग्रेज़ी)",
+            [LANG_TAMIL] = "English"
         },
         ["btn_lang_spanish"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Español",
             [LANG_SPANISH] = "Español",
-            [LANG_HINDI] = "Español (स्पैनिश)"
+            [LANG_HINDI] = "Español (स्पैनिश)",
+            [LANG_TAMIL] = "Español"
         },
         ["btn_lang_hindi"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "हिन्दी",
             [LANG_SPANISH] = "Hindi",
-            [LANG_HINDI] = "हिन्दी (Hindi)"
+            [LANG_HINDI] = "हिन्दी (Hindi)",
+            [LANG_TAMIL] = "हिन्दी"
+        },
+        ["btn_lang_tamil"] = new Dictionary<string, string>
+        {
+            [LANG_ENGLISH] = "Tamil",
+            [LANG_SPANISH] = "Tamil",
+            [LANG_HINDI] = "तमिल",
+            [LANG_TAMIL] = "தமிழ்"
         },
         ["btn_back"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Back",
             [LANG_SPANISH] = "Atrás",
-            [LANG_HINDI] = "वापस"
+            [LANG_HINDI] = "वापस",
+            [LANG_TAMIL] = "திரும்பு"
         },
         ["btn_submit"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Submit",
             [LANG_SPANISH] = "Enviar",
-            [LANG_HINDI] = "सबमिट करें"
+            [LANG_HINDI] = "सबमिट करें",
+            [LANG_TAMIL] = "சமர்ப்பிக்கவும்"
         },
         ["Guide_Text"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "You can always change the language by accessing Tools > Set Language",
             [LANG_SPANISH] = "Siempre puedes cambiar el idioma accediendo a Herramientas > Establecer idioma",
-            [LANG_HINDI] = "आप टूल्स > सेट लैंग्वेज पर जाकर भाषा बदल सकते हैं।"
+            [LANG_HINDI] = "आप टूल्स > सेट लैंग्वेज पर जाकर भाषा बदल सकते हैं।",
+            [LANG_TAMIL] = "கருவிகள் > மொழியை அமைக்கவும் என்ற பகுதிக்குச் செல்வதன் மூலம் நீங்கள் எப்போது வேண்டுமானாலும் மொழியை மாற்றலாம்."
         },
         ["change_langauge"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Change Language",
             [LANG_SPANISH] = "Cambiar idioma",
-            [LANG_HINDI] = "भाषा बदलें"
+            [LANG_HINDI] = "भाषा बदलें",
+            [LANG_TAMIL] = "மொழியை மாற்றவும்"
         },
 
         // ---------------- AR HUD & Action Buttons ----------------
@@ -143,92 +175,107 @@ public class LanguageManager : MonoBehaviour
         {
             [LANG_ENGLISH] = "Action",
             [LANG_SPANISH] = "Acción",
-            [LANG_HINDI] = "एक्शन"
+            [LANG_HINDI] = "एक्शन",
+            [LANG_TAMIL] = "செயல்"
         },
-        ["btn_move"] = new Dictionary<string, string>
-        {
-            [LANG_ENGLISH] = "Walk",
-            [LANG_SPANISH] = "Caminar",
-            [LANG_HINDI] = "चलें"
-        },
-        ["btn_idle"] = new Dictionary<string, string>
-        {
-            [LANG_ENGLISH] = "Idle",
-            [LANG_SPANISH] = "Reposo",
-            [LANG_HINDI] = "शांत"
-        },
+        // ["btn_move"] = new Dictionary<string, string>
+        // {
+        //     [LANG_ENGLISH] = "Walk",
+        //     [LANG_SPANISH] = "Caminar",
+        //     [LANG_HINDI] = "चलें",
+        //     [LANG_TAMIL] = "நட"
+        // },
+        // ["btn_idle"] = new Dictionary<string, string>
+        // {
+        //     [LANG_ENGLISH] = "Idle",
+        //     [LANG_SPANISH] = "Reposo",
+        //     [LANG_HINDI] = "शांत",
+        //     [LANG_TAMIL] = "ஓய்வு"
+        // },
         ["btn_audio"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Roar",
             [LANG_SPANISH] = "Rugido",
-            [LANG_HINDI] = "आवाज़"
+            [LANG_HINDI] = "आवाज़",
+            [LANG_TAMIL] = "கர்ஜனை"
         },
-        ["btn_fast_audio"] = new Dictionary<string, string>
-        {
-            [LANG_ENGLISH] = "Fast Audio",
-            [LANG_SPANISH] = "Audio Rápido",
-            [LANG_HINDI] = "फास्ट ऑडियो"
-        },
+        // ["btn_fast_audio"] = new Dictionary<string, string>
+        // {
+        //     [LANG_ENGLISH] = "Fast Audio",
+        //     [LANG_SPANISH] = "Audio Rápido",
+        //     [LANG_HINDI] = "फास्ट ऑडियो",
+        //     [LANG_TAMIL] = "வேகமான ஒலி"
+        // },
         ["btn_share"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Share",
             [LANG_SPANISH] = "Compartir",
-            [LANG_HINDI] = "साझा करें"
+            [LANG_HINDI] = "साझा करें",
+            [LANG_TAMIL] = "பகிரவும்"
         },
-        ["btn_wikipedia"] = new Dictionary<string, string>
-        {
-            [LANG_ENGLISH] = "Wikipedia",
-            [LANG_SPANISH] = "Wikipedia",
-            [LANG_HINDI] = "विकिपीडिया"
-        },
+        // ["btn_wikipedia"] = new Dictionary<string, string>
+        // {
+        //     [LANG_ENGLISH] = "Wikipedia",
+        //     [LANG_SPANISH] = "Wikipedia",
+        //     [LANG_HINDI] = "विकिपीडिया",
+        //     [LANG_TAMIL] = "விக்கிப்பீடியா"
+        // },
         ["mode_3d"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "3D",
             [LANG_SPANISH] = "3D",
-            [LANG_HINDI] = "3D"
+            [LANG_HINDI] = "3D",
+            [LANG_TAMIL] = "3D"
         },
         ["mode_2d"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "2D",
             [LANG_SPANISH] = "2D",
-            [LANG_HINDI] = "2D"
+            [LANG_HINDI] = "2D",
+            [LANG_TAMIL] = "2D"
         },
         ["guidance_scan"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Point camera at an Animal card to begin 4D AR experience",
             [LANG_SPANISH] = "Apunta la cámara a una tarjeta de animal para comenzar la experiencia 4D AR",
-            [LANG_HINDI] = "4D AR अनुभव शुरू करने के लिए कैमरे को एनिमल कार्ड की ओर करें"
+            [LANG_HINDI] = "4D AR अनुभव शुरू करने के लिए कैमरे को एनिमल कार्ड की ओर करें",
+            [LANG_TAMIL] = "4D AR அனுபவத்தைத் தொடங்க, விலங்கு அட்டையை நோக்கி கேமராவைக் காட்டவும்."
         },
         ["info_title_header"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Animal Encyclopedia",
             [LANG_SPANISH] = "Enciclopedia Animal",
-            [LANG_HINDI] = "जानवर की जानकारी"
+            [LANG_HINDI] = "जानवर की जानकारी",
+            [LANG_TAMIL] = "விலங்குகள் பற்றிய கலைக்களஞ்சியம்"
         },
         ["fun_fact_prefix"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "💡 Fun Fact: ",
             [LANG_SPANISH] = "💡 Dato Curioso: ",
-            [LANG_HINDI] = "💡 रोचक तथ्य: "
+            [LANG_HINDI] = "💡 रोचक तथ्य: ",
+            [LANG_TAMIL] = "💡 சுவாரஸ்யமான தகவல்: "
         },
         ["lbl_classification"] = new Dictionary<string, string>
         {
             [LANG_ENGLISH] = "Classification",
             [LANG_SPANISH] = "Clasificación",
-            [LANG_HINDI] = "वर्गीकरण"
+            [LANG_HINDI] = "वर्गीकरण",
+            [LANG_TAMIL] = "வகைப்பாடு"
         },
-        ["lbl_era"] = new Dictionary<string, string>
-        {
-            [LANG_ENGLISH] = "Era / Period",
-            [LANG_SPANISH] = "Era / Período",
-            [LANG_HINDI] = "काल / युग"
-        },
-        ["lbl_dimensions"] = new Dictionary<string, string>
-        {
-            [LANG_ENGLISH] = "Dimensions",
-            [LANG_SPANISH] = "Dimensiones",
-            [LANG_HINDI] = "आकार व वजन"
-        }
+        // ["lbl_era"] = new Dictionary<string, string>
+        // {
+        //     [LANG_ENGLISH] = "Era / Period",
+        //     [LANG_SPANISH] = "Era / Período",
+        //     [LANG_HINDI] = "काल / युग",
+        //     [LANG_TAMIL] = "காலம் / யுகம்"
+        // },
+        // ["lbl_dimensions"] = new Dictionary<string, string>
+        // {
+        //     [LANG_ENGLISH] = "Dimensions",
+        //     [LANG_SPANISH] = "Dimensiones",
+        //     [LANG_HINDI] = "आकार व वजन",
+        //     [LANG_TAMIL] = "அளவு மற்றும் எடை"
+        // }
     };
 
     public struct LocalizedAnimalInfo
@@ -280,6 +327,17 @@ public class LanguageManager : MonoBehaviour
                 Weight = "8,400 किग्रा (8.4 मीट्रिक टन)",
                 Description = "टायरानोसॉरस रेक्स ('तानाशाह छिपकलियों का राजा') सर्वकालिक सबसे शक्तिशाली मांसाहारी जीवों में से एक था। इसके पास 12 इंच तक लंबे दांतेदार दांत, बेहतरीन दूरबीन दृष्टि और मीलों दूर से शिकार सूंघने की असाधारण क्षमता थी।",
                 FunFact = "टी-रेक्स के पास इतिहास में किसी भी स्थलीय जीव की तुलना में सबसे मजबूत काटने का बल (12,800 पाउंड से अधिक) था, जो हड्डियों को आसानी से चकनाचूर कर देता था!"
+            },
+            [LANG_TAMIL] = new LocalizedAnimalInfo
+            {
+                Name = "டைரனோசாரஸ் ரெக்ஸ்",
+                ScientificName = "டைரனோசாரஸ் ரெக்ஸ்",
+                Classification = "உச்சநிலை மாமிச உண்ணி (தெரோபோட்)",
+                Era = "பிந்தைய கிரிட்டேசியஸ் காலம் (சுமார் 6.8 – 6.6 கோடி ஆண்டுகளுக்கு முன்பு)",
+                Length = "12.3 மீட்டர் (40 அடி)",
+                Weight = "8,400 கிலோகிராம் (8.4 மெட்ரிக் டன்)",
+                Description = "டைரனோசாரஸ் ரெக்ஸ் ('கொடுங்கோல் பல்லிகளின் அரசன்') பூமியின் வரலாற்றில் வாழ்ந்த மிகவும் சக்திவாய்ந்த நிலவாழ் மாமிச உண்ணிகளில் ஒன்றாகும். இது 12 அங்குலம் வரை நீளமுள்ள, ரம்பம் போன்ற கூர்மையான பற்களையும், இரு கண்களின் பார்வையையும் ஒருங்கிணைத்துச் சிறப்பாகக் காணும் திறனையும், பல மைல் தொலைவில் உள்ள இரையைக் கண்டறியக்கூடிய கூர்மையான மோப்ப உணர்வையும் கொண்டிருந்தது.",
+                FunFact = "டைரனோசாரஸ் ரெக்ஸ் வரலாற்றில் வாழ்ந்த நிலவாழ் விலங்குகளிலேயே மிகவும் வலிமையான கடிக்கும் சக்தியைக் கொண்டிருந்தது — 12,800 பவுண்டுகளுக்கும் அதிகமான நசுக்கும் விசையுடன், உறுதியான எலும்புகளைக்கூட எளிதில் நொறுக்கும் திறன் கொண்டிருந்தது!"
             }
         },
 
@@ -317,6 +375,17 @@ public class LanguageManager : MonoBehaviour
                 Weight = "5,000 किग्रा (5 मीट्रिक टन)",
                 Description = "स्टेगोसॉरस अपनी पीठ पर लगी विशिष्ट हीरों जैसी सीधी हड्डियों की प्लेटों और पूंछ पर चार घातक नुकीले कांटों (थैगोमाइज़र) के लिए प्रसिद्ध है, जिसका उपयोग वह एलोसॉरस जैसे शिकारियों से अपनी रक्षा के लिए करता था।",
                 FunFact = "लगभग 5 मीट्रिक टन वजन होने के बावजूद, स्टेगोसॉरस का दिमाग आश्चर्यजनक रूप से केवल एक अखरोट के आकार का था!"
+            },
+            [LANG_TAMIL] = new LocalizedAnimalInfo
+            {
+                Name = "ஸ்டெகோசாரஸ்",
+                ScientificName = "ஸ்டெகோசாரஸ் ஸ்டெனாப்ஸ்",
+                Classification = "கவசம் கொண்ட தாவர உண்ணி (தைரியோஃபோரன்)",
+                Era = "பிந்தைய ஜுராசிக் காலம் (சுமார் 15.5 – 15 கோடி ஆண்டுகளுக்கு முன்பு)",
+                Length = "9.0 மீட்டர் (30 அடி)",
+                Weight = "5,000 கிலோகிராம் (5 மெட்ரிக் டன்)",
+                Description = "ஸ்டெகோசாரஸ் ('கூரை போன்ற பல்லி') தனது வளைந்த முதுகின் மேல் வரிசையாக அமைந்திருந்த தனித்துவமான, நிமிர்ந்த வைர வடிவ எலும்புத் தகடுகளுக்காகவும், வால் பகுதியில் இருந்த நான்கு கொடிய கூர்மையான முட்களுக்காகவும் புகழ்பெற்றது. 'தாகோமைசர்' என்று அழைக்கப்படும் இந்த வால் முட்களை, அலோசாரஸ் போன்ற உச்சநிலை வேட்டையாடிகளிடமிருந்து தற்காத்துக்கொள்ளப் பயன்படுத்தியது.",
+                FunFact = "சுமார் 5 மெட்ரிக் டன் எடை கொண்டிருந்தபோதிலும், ஸ்டெகோசாரஸின் மூளை வியக்கத்தக்க வகையில் சிறியதாக இருந்தது — அது ஒரு வால்நட் பருப்பின் அளவு மட்டுமே!"
             }
         },
 
@@ -354,6 +423,17 @@ public class LanguageManager : MonoBehaviour
                 Weight = "6,000 किग्रा (6 मीट्रिक टन)",
                 Description = "एंकाइलोसॉरस एक अत्यंत सुरक्षित जीवित टैंक था, जो मोटी हड्डियों की कवचदार प्लेटों और सुरक्षात्मक नुकीलों से ढका था। इसकी पूंछ के सिरे पर एक भारी हड्डी की गदा थी जो शिकारी डायनासोरों की हड्डियों को तोड़ सकती थी।",
                 FunFact = "एंकाइलोसॉरस की पलकों पर भी सुरक्षात्मक हड्डी की परत थी, जिससे टी-रेक्स जैसे शिकारी भी इसे नुकसान नहीं पहुंचा पाते थे!"
+            },
+            [LANG_TAMIL] = new LocalizedAnimalInfo
+            {
+                Name = "அன்கிலோசாரஸ்",
+                ScientificName = "அன்கிலோசாரஸ் மேக்னிவென்ட்ரிஸ்",
+                Classification = "கவசம் கொண்ட தாவர உண்ணி (உயிருள்ள கோட்டை)",
+                Era = "பிந்தைய கிரிட்டேசியஸ் காலம் (சுமார் 6.8 – 6.6 கோடி ஆண்டுகளுக்கு முன்பு)",
+                Length = "8.0 மீட்டர் (26 அடி)",
+                Weight = "6,000 கிலோகிராம் (6 மெட்ரிக் டன்)",
+                Description = "அன்கிலோசாரஸ் என்பது தடிமனான எலும்புத் தகடுகள், பாதுகாப்பான ஓவல் வடிவ எலும்புக் கவசங்கள் மற்றும் வலுவூட்டப்பட்ட முட்கள் ஆகியவற்றால் மூடப்பட்டிருந்த, கவச வாகனத்தைப் போன்ற ஒரு டைனோசர் ஆகும். இதன் வலுவான வாலின் நுனியில் இருந்த பெரிய எலும்புத் தடியால், வேட்டையாடும் விலங்குகளின் கால்களைக்கூட நொறுக்க முடியும்.",
+                FunFact = "அன்கிலோசாரஸின் கண் இமைகளில்கூட எலும்புக் கவசப் பாதுகாப்பு இருந்தது! இதனால், டி-ரெக்ஸ் போன்ற பெரிய வேட்டையாடிகளின் தாக்குதல்களிலிருந்தும் இது கிட்டத்தட்ட பாதிப்பின்றித் தப்பிக்கக்கூடியதாக இருந்தது!"
             }
         }
     };
@@ -437,25 +517,28 @@ public class LanguageManager : MonoBehaviour
         SetLanguage(pendingLanguage);
     }
 
-    /// <summary>
-    /// Switches language between English, Spanish, and Hindi cyclically.
-    /// </summary>
-    public void CycleLanguage()
+     /// <summary>
+/// Switches language between English, Spanish, Hindi and Tamil cyclically.
+/// </summary>
+public void CycleLanguage()
+{
+    switch (currentLanguage)
     {
-        switch (currentLanguage)
-        {
-            case LANG_ENGLISH:
-                SetLanguage(LANG_SPANISH);
-                break;
-            case LANG_SPANISH:
-                SetLanguage(LANG_HINDI);
-                break;
-            default:
-                SetLanguage(LANG_ENGLISH);
-                break;
-        }
+        case LANG_ENGLISH:
+            SetLanguage(LANG_SPANISH);
+            break;
+        case LANG_SPANISH:
+            SetLanguage(LANG_HINDI);
+            break;
+        case LANG_HINDI:
+            SetLanguage(LANG_TAMIL);
+            break;
+        case LANG_TAMIL:
+        default:
+            SetLanguage(LANG_ENGLISH);
+            break;
     }
-
+}
     /// <summary>
     /// Returns the localized string for a given key in the current language.
     /// </summary>
@@ -639,6 +722,9 @@ public class LanguageManager : MonoBehaviour
             if (hindiButton == null && tName == "Hindi_button")
                 hindiButton = t.GetComponent<Button>();
 
+            if (tamilButton == null && tName == "Tamil_button")
+                tamilButton = t.GetComponent<Button>();
+
             if (englishButton == null && tName == "English_button")
                 englishButton = t.GetComponent<Button>();
 
@@ -650,6 +736,8 @@ public class LanguageManager : MonoBehaviour
             // PanelController builds that string itself ("Loading... 45%").
             if (tName == "Caution_text")
                 AttachLocalizedText(t.gameObject, "lbl_parental_supervision");
+            else if (tName == "Caution_Title-txt")
+                AttachLocalizedText(t.gameObject, "caution_title");
             else if (tName == "infotext")
                 AttachLocalizedText(t.gameObject, "Guide_Text");
             else if (tName == "Change_Language")
@@ -706,6 +794,26 @@ public class LanguageManager : MonoBehaviour
             englishButton = engGo.GetComponent<Button>();
         }
 
+        // If Tamil button doesn't exist in scene, clone it from the Hindi button
+        // (falls back to the Spanish button), and place it right after Hindi.
+        if (tamilButton == null)
+        {
+            Button source = hindiButton != null ? hindiButton : spanishButton;
+            if (source != null && source.transform.parent != null)
+            {
+                GameObject tamGo = Instantiate(source.gameObject, source.transform.parent);
+                tamGo.name = "Tamil_button";
+
+                if (hindiButton != null)
+                    tamGo.transform.SetSiblingIndex(hindiButton.transform.GetSiblingIndex() + 1);
+
+                UniText unitext = tamGo.GetComponentInChildren<UniText>(true);
+                if (unitext != null) unitext.Text = "தமிழ்";
+
+                tamilButton = tamGo.GetComponent<Button>();
+            }
+        }
+
         // If Submit button doesn't exist in scene, clone it from the Back button
         // (reposition the clone in your Setting panel layout as needed)
         if (submitButton == null && backButton != null && backButton.transform.parent != null)
@@ -758,6 +866,12 @@ public class LanguageManager : MonoBehaviour
             hindiButton.onClick.AddListener(() => SelectPendingLanguage(LANG_HINDI));
         }
 
+        if (tamilButton != null)
+        {
+            tamilButton.onClick = new Button.ButtonClickedEvent();
+            tamilButton.onClick.AddListener(() => SelectPendingLanguage(LANG_TAMIL));
+        }
+
         // Submit button APPLIES the selected language
         if (submitButton != null)
         {
@@ -775,6 +889,7 @@ public class LanguageManager : MonoBehaviour
         SetButtonHighlight(englishButton, pendingLanguage == LANG_ENGLISH);
         SetButtonHighlight(spanishButton, pendingLanguage == LANG_SPANISH);
         SetButtonHighlight(hindiButton,   pendingLanguage == LANG_HINDI);
+        SetButtonHighlight(tamilButton,   pendingLanguage == LANG_TAMIL);
 
         if (submitButton != null)
             submitButton.interactable = (pendingLanguage != currentLanguage);

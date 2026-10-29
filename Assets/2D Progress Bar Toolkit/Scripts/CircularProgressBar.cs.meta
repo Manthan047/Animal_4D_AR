@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 14f8a4a7152d1f04da7535f2392f4c87
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 87620
+  packageName: Progress Bar Kit
+  packageVersion: 5.0
+  assetPath: Assets/2D Progress Bar Toolkit/Scripts/CircularProgressBar.cs
+  uploadId: 966816

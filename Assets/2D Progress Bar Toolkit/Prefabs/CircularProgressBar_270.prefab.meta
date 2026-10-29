@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 3a5b7a5c2e89046ac8dd542edf2a23d5
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 87620
+  packageName: Progress Bar Kit
+  packageVersion: 5.0
+  assetPath: Assets/2D Progress Bar Toolkit/Prefabs/CircularProgressBar_270.prefab
+  uploadId: 966816

@@ -219,7 +219,19 @@ public class ARUIManager : MonoBehaviour
         }
 
         if (actionButton != null) actionButton.onClick.AddListener(OnActionButtonClicked);
-        if (infoToggleBtn != null) infoToggleBtn.onClick.AddListener(ToggleInfoCard);
+
+        // Do not add ToggleInfoCard if PanelController is already managing info_button,
+        // because both listeners firing on the same click causes PanelController to open
+        // the panel and ToggleInfoCard to immediately close it in the exact same frame.
+        PanelController pc = FindAnyObjectByType<PanelController>(FindObjectsInactive.Include);
+        bool handledByPanelController = pc != null && pc.InfoButtonObject != null &&
+            (infoToggleBtn == null || infoToggleBtn.gameObject == pc.InfoButtonObject || infoToggleBtn.transform.IsChildOf(pc.InfoButtonObject.transform));
+
+        if (infoToggleBtn != null && !handledByPanelController)
+        {
+            infoToggleBtn.onClick.AddListener(ToggleInfoCard);
+        }
+
         if (backButton != null) backButton.onClick.AddListener(OnBackButtonClicked);
         if (view2D3DToggle != null) view2D3DToggle.onValueChanged.AddListener(OnView2D3DToggleChanged);
 
@@ -286,8 +298,9 @@ public class ARUIManager : MonoBehaviour
 
     private void HandleLanguageChanged(string newLang)
     {
-        // The narration clip can differ per language, so stop whatever is playing
-        // and return to the muted state.
+        // The narration clip differs per language, so stop whatever is playing
+        // and return to the muted state. The next tap on the volume icon will
+        // play the clip for the newly selected language.
         StopDescriptionAudio();
 
         ResolveCurrentAnimalData();
@@ -420,7 +433,12 @@ public class ARUIManager : MonoBehaviour
 
         if (infoCardPanel != null) infoCardPanel.SetActive(true);
 
-        // FIX: every time the info card is freshly opened, audio must be stopped
+        if (animalCatalogManager != null && animalCatalogManager.detailView != null && !animalCatalogManager.detailView.activeSelf)
+        {
+            animalCatalogManager.detailView.SetActive(true);
+        }
+
+        // Every time the info card is freshly opened, audio must be stopped
         // and the toggle/icon must be in the MUTED state. (Only when it was not
         // already open, so a repeated call doesn't cut off narration that is playing.)
         if (!wasAlreadyOpen)
@@ -462,29 +480,49 @@ public class ARUIManager : MonoBehaviour
 
     private void ResolveCurrentAnimalData()
     {
+        // 1. If an animal is currently active in AR, always use the detected model
+        if (ARAnimalManager.Instance != null && ARAnimalManager.Instance.HasActiveAnimal && ARAnimalManager.Instance.SelectedAnimal != null)
+        {
+            AnimalData tracked = ARAnimalManager.Instance.SelectedAnimal.GetAnimalData();
+            if (tracked != null)
+            {
+                currentAnimalData = tracked;
+                return;
+            }
+        }
+
+        // 2. If currentAnimalData is already valid, preserve it
         if (currentAnimalData != null) return;
 
-        if (ARAnimalManager.Instance != null && ARAnimalManager.Instance.SelectedAnimal != null)
-        {
-            currentAnimalData = ARAnimalManager.Instance.SelectedAnimal.GetAnimalData();
-        }
-
-        if (currentAnimalData == null && animalCatalogManager != null && animalCatalogManager.CurrentSelectedData != null)
+        // 3. Fallback to catalog manager current selected animal or first card
+        if (animalCatalogManager != null && animalCatalogManager.CurrentSelectedData != null)
         {
             currentAnimalData = animalCatalogManager.CurrentSelectedData;
+            return;
         }
 
-        if (currentAnimalData == null)
+        if (animalCatalogManager != null && animalCatalogManager.animals != null && animalCatalogManager.animals.Count > 0 && animalCatalogManager.animals[0] != null)
         {
-            AnimalData[] all = Resources.LoadAll<AnimalData>("Data");
-            if (all == null || all.Length == 0) all = Resources.LoadAll<AnimalData>("");
-            if (all != null && all.Length > 0) currentAnimalData = all[0];
+            currentAnimalData = animalCatalogManager.animals[0];
+            return;
         }
+
+        // 4. Fallback to Resources
+        AnimalData[] all = Resources.LoadAll<AnimalData>("Data");
+        if (all == null || all.Length == 0) all = Resources.LoadAll<AnimalData>("");
+        if (all != null && all.Length > 0) currentAnimalData = all[0];
     }
 
     public void ToggleInfoCard()
     {
         if (infoToggleBtn != null) AnimateButtonPress(infoToggleBtn.transform);
+
+        PanelController pc = FindAnyObjectByType<PanelController>(FindObjectsInactive.Include);
+        if (pc != null)
+        {
+            pc.OnInfoButtonClicked();
+            return;
+        }
 
         if (infoCardPanel != null)
         {
@@ -542,7 +580,7 @@ public class ARUIManager : MonoBehaviour
 
     // =========================================================
     // DESCRIPTION NARRATION AUDIO TOGGLE LOGIC
-    // Default = muted icon. Tap -> narration plays + unmuted icon.
+    // Default = muted icon. Tap -> narration for the SELECTED LANGUAGE plays + unmuted icon.
     // Tap again / audio ends / animal, language or panel changes -> muted icon.
     // Opening the info card always starts in the muted state.
     // =========================================================
@@ -563,9 +601,16 @@ public class ARUIManager : MonoBehaviour
 
     private void PlayDescriptionAudio()
     {
-        if (currentAnimalData == null || currentAnimalData.descriptionAudioClip == null)
+        // Make sure we have the right animal before picking a clip.
+        if (currentAnimalData == null) ResolveCurrentAnimalData();
+
+        // Clip for the language the user selected (falls back to English, then to the old single clip).
+        AudioClip clip = currentAnimalData != null ? currentAnimalData.GetLocalizedDescriptionAudio() : null;
+
+        if (clip == null)
         {
-            Debug.LogWarning("[ARUIManager] No description audio clip assigned for the current animal.");
+            string lang = LanguageManager.Instance != null ? LanguageManager.Instance.CurrentLanguage : "English";
+            Debug.LogWarning($"[ARUIManager] No description audio clip assigned for the current animal (language: {lang}).");
             SetAudioToggleState(false);
             return;
         }
@@ -576,7 +621,8 @@ public class ARUIManager : MonoBehaviour
             return;
         }
 
-        descriptionAudioSource.clip = currentAnimalData.descriptionAudioClip;
+        descriptionAudioSource.Stop();
+        descriptionAudioSource.clip = clip;
         descriptionAudioSource.Play();
         isPlayingDescriptionAudio = true;
     }
@@ -612,7 +658,7 @@ public class ARUIManager : MonoBehaviour
     {
         if (audioToggle == null) return;
 
-        bool hasClip = currentAnimalData != null && currentAnimalData.descriptionAudioClip != null;
+        bool hasClip = currentAnimalData != null && currentAnimalData.GetLocalizedDescriptionAudio() != null;
         audioToggle.interactable = hasClip;
     }
 

@@ -1,4 +1,3 @@
-
 using System.Collections;
 using System.IO;
 using UnityEngine;
@@ -13,7 +12,8 @@ public class ARScreenshotManager : MonoBehaviour
         TopLeft,
         TopRight,
         BottomLeft,
-        BottomRight
+        BottomRight,
+        Custom
     }
 
     [Header("UI References")]
@@ -33,6 +33,19 @@ public class ARScreenshotManager : MonoBehaviour
     [Range(0f, 0.1f)]
     [SerializeField] private float logoMarginPercent = 0.03f;
 
+    [Header("Logo Custom Position")]
+    [Tooltip("Used only when Logo Position = Custom.\n" +
+             "X: 0 = left edge, 1 = right edge.\n" +
+             "Y: 0 = bottom edge, 1 = top edge.\n" +
+             "The value places the CENTER of the logo.")]
+    [SerializeField] private Vector2 customPosition =
+        new Vector2(0.5f, 0.9f);
+
+    [Header("Logo Extra Offset")]
+    [Tooltip("Extra pixel offset added on top of ANY position " +
+             "(preset or custom). +X = right, +Y = up.")]
+    [SerializeField] private Vector2 pixelOffset = Vector2.zero;
+
     private bool isCapturing;
 
     public void CaptureModelPhoto()
@@ -40,6 +53,17 @@ public class ARScreenshotManager : MonoBehaviour
         if (isCapturing) return;
 
         StartCoroutine(CaptureScreenshotRoutine());
+    }
+
+    /// <summary>
+    /// Set the logo position at runtime (normalized 0-1, logo center).
+    /// X: 0 = left, 1 = right. Y: 0 = bottom, 1 = top.
+    /// </summary>
+    public void SetCustomLogoPosition(float x, float y)
+    {
+        logoPosition = LogoPosition.Custom;
+        customPosition = new Vector2(
+            Mathf.Clamp01(x), Mathf.Clamp01(y));
     }
 
     private IEnumerator CaptureScreenshotRoutine()
@@ -172,6 +196,12 @@ public class ARScreenshotManager : MonoBehaviour
         int startX;
         switch (logoPosition)
         {
+            case LogoPosition.Custom:
+                // Logo center placed at normalized X.
+                startX = Mathf.RoundToInt(
+                    customPosition.x * target.width - logoW * 0.5f);
+                break;
+
             case LogoPosition.TopMiddle:
             case LogoPosition.BottomMiddle:
                 startX = (target.width - logoW) / 2;
@@ -190,6 +220,12 @@ public class ARScreenshotManager : MonoBehaviour
         int startY;
         switch (logoPosition)
         {
+            case LogoPosition.Custom:
+                // Logo center placed at normalized Y (0 = bottom).
+                startY = Mathf.RoundToInt(
+                    customPosition.y * target.height - logoH * 0.5f);
+                break;
+
             case LogoPosition.BottomMiddle:
             case LogoPosition.BottomLeft:
             case LogoPosition.BottomRight:
@@ -200,6 +236,10 @@ public class ARScreenshotManager : MonoBehaviour
                 startY = target.height - logoH - margin;
                 break;
         }
+
+        // Apply extra pixel offset (works with any position mode).
+        startX += Mathf.RoundToInt(pixelOffset.x);
+        startY += Mathf.RoundToInt(pixelOffset.y);
 
         startX = Mathf.Clamp(startX, 0, target.width - logoW);
         startY = Mathf.Clamp(startY, 0, target.height - logoH);
@@ -239,6 +279,6 @@ public class ARScreenshotManager : MonoBehaviour
         target.Apply();
 
         Debug.Log(
-            $"[ARScreenshotManager] Logo applied: {logoW}x{logoH}");
+            $"[ARScreenshotManager] Logo applied: {logoW}x{logoH} at ({startX}, {startY})");
     }
 }
